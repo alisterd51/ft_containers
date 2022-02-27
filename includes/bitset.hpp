@@ -6,12 +6,14 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:56:36 by antoine           #+#    #+#             */
-/*   Updated: 2022/02/27 00:57:14 by antoine          ###   ########.fr       */
+/*   Updated: 2022/02/27 16:27:35 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BITSET_HPP
 # define BITSET_HPP
+
+#include <string>
 
 namespace ft
 {
@@ -34,10 +36,10 @@ namespace ft
 			bitset(unsigned long val);
 			template<class charT, class traits, class Allocator>
 				explicit bitset(
-						const basic_string<charT,traits,Allocator>& str,
-						typename basic_string<charT,traits,Allocator>::size_type pos = 0,
-						typename basic_string<charT,traits,Allocator>::size_type n =
-						basic_string<charT,traits,Allocator>::npos);
+						const std::basic_string<charT,traits,Allocator>& str,
+						typename std::basic_string<charT,traits,Allocator>::size_type pos = 0,
+						typename std::basic_string<charT,traits,Allocator>::size_type n =
+						std::basic_string<charT,traits,Allocator>::npos);
 			// 23.3.5.2 bitset operations:
 			bitset<N>& operator&=(const bitset<N>& rhs);
 			bitset<N>& operator|=(const bitset<N>& rhs);
@@ -55,7 +57,7 @@ namespace ft
 			reference operator[](size_t pos); // for b[i];
 			unsigned long to_ulong() const;
 			template <class charT, class traits, class Allocator>
-				basic_string<charT, traits, Allocator> to_string() const;
+				std::basic_string<charT, traits, Allocator> to_string() const;
 			size_t count() const;
 			size_t size() const;
 			bool operator==(const bitset<N>& rhs) const;

@@ -6,14 +6,14 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/26 23:11:17 by antoine           #+#    #+#             */
-/*   Updated: 2022/02/27 00:04:55 by antoine          ###   ########.fr       */
+/*   Updated: 2022/02/27 15:54:16 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <string>
 #include <deque>
-#if 0 //CREATE A REAL STL EXAMPLE
+#if 1 //CREATE A REAL STL EXAMPLE
 # include <map>
 # include <stack>
 # include <vector>

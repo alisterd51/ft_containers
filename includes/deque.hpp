@@ -6,16 +6,18 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:28:09 by antoine           #+#    #+#             */
-/*   Updated: 2022/02/27 00:30:32 by antoine          ###   ########.fr       */
+/*   Updated: 2022/02/27 16:55:53 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef DEQUE_HPP
 # define DEQUE_HPP
 
+# include <deque>
+
 namespace ft
 {
-	template <class T, class Allocator = allocator<T> >
+	template <class T, class Allocator = std::allocator<T> >
 		class deque
 		{
 			public:

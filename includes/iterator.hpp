@@ -6,12 +6,15 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/02/27 01:04:41 by antoine          ###   ########.fr       */
+/*   Updated: 2022/02/27 16:15:58 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
+
+# include <cstddef>
+# include <string>
 
 namespace ft
 {
@@ -76,7 +79,7 @@ namespace ft
 	template <class Container, class Iterator>
 		insert_iterator<Container> inserter(Container& x, Iterator i);
 	// 24.5, stream iterators:
-	template <class T, class charT = char, class traits = char_traits<charT>,
+	template <class T, class charT = char, class traits = std::char_traits<charT>,
 			 class Distance = ptrdiff_t>
 				 class istream_iterator;
 	template <class T, class charT, class traits, class Distance>
@@ -85,9 +88,9 @@ namespace ft
 	template <class T, class charT, class traits, class Distance>
 		bool operator!=(const istream_iterator<T,charT,traits,Distance>& x,
 				const istream_iterator<T,charT,traits,Distance>& y);
-	template <class T, class charT = char, class traits = char_traits<charT> >
+	template <class T, class charT = char, class traits = std::char_traits<charT> >
 		class ostream_iterator;
-	template<class charT, class traits = char_traits<charT> >
+	template<class charT, class traits = std::char_traits<charT> >
 		class istreambuf_iterator;
 	template <class charT, class traits>
 		bool operator==(const istreambuf_iterator<charT,traits>& a,
@@ -95,7 +98,7 @@ namespace ft
 	template <class charT, class traits>
 		bool operator!=(const istreambuf_iterator<charT,traits>& a,
 				const istreambuf_iterator<charT,traits>& b);
-	template <class charT, class traits = char_traits<charT> >
+	template <class charT, class traits = std::char_traits<charT> >
 		class ostreambuf_iterator;
 }
 
@@ -107,34 +110,35 @@ namespace ft
 								 typename iterator_traits<Iterator>::value_type,
 								 typename iterator_traits<Iterator>::difference_type,
 								 typename iterator_traits<Iterator>::pointer,
-								 typename iterator_traits<Iterator>::reference> {
-									 protected:
-										 Iterator current;
-									 public:
-										 typedef Iterator
-											 iterator_type;
-										 typedef typename iterator_traits<Iterator>::difference_type
-											 difference_type;
-										 typedef typename iterator_traits<Iterator>::reference
-											 reference;
-										 typedef typename iterator_traits<Iterator>::pointer
-											 pointer;
-										 reverse_iterator();
-										 explicit reverse_iterator(Iterator x);
-										 template <class U> reverse_iterator(const reverse_iterator<U>& u);
-										 Iterator base() const; // explicit
-										 reference operator*() const;
-										 pointer operator->() const;
-										 reverse_iterator& operator++();
-										 reverse_iterator operator++(int);
-										 reverse_iterator& operator--();
-										 reverse_iterator operator--(int);
-										 reverse_iterator operator+ (difference_type n) const;
-										 reverse_iterator& operator+=(difference_type n);
-										 reverse_iterator operator- (difference_type n) const;
-										 reverse_iterator& operator-=(difference_type n);
-										 reference operator[](difference_type n) const;
-								 };
+								 typename iterator_traits<Iterator>::reference>
+	{
+		protected:
+			Iterator current;
+		public:
+			typedef Iterator
+				iterator_type;
+			typedef typename iterator_traits<Iterator>::difference_type
+				difference_type;
+			typedef typename iterator_traits<Iterator>::reference
+				reference;
+			typedef typename iterator_traits<Iterator>::pointer
+				pointer;
+			reverse_iterator();
+			explicit reverse_iterator(Iterator x);
+			template <class U> reverse_iterator(const reverse_iterator<U>& u);
+			Iterator base() const; // explicit
+			reference operator*() const;
+			pointer operator->() const;
+			reverse_iterator& operator++();
+			reverse_iterator operator++(int);
+			reverse_iterator& operator--();
+			reverse_iterator operator--(int);
+			reverse_iterator operator+ (difference_type n) const;
+			reverse_iterator& operator+=(difference_type n);
+			reverse_iterator operator- (difference_type n) const;
+			reverse_iterator& operator-=(difference_type n);
+			reference operator[](difference_type n) const;
+	};
 	template <class Iterator>
 		bool operator==(
 				const reverse_iterator<Iterator>& x,
