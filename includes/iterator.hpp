@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/02 03:49:38 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/02 19:46:51 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ namespace ft
 	template<class Iterator> struct iterator_traits;
 	template<class T> struct iterator_traits<T*>;
 	template<class T> struct iterator_traits<const T*>;
-
 	template<class Category, class T, class Distance = ptrdiff_t, class Pointer = T*, class Reference = T&> struct iterator;
+	
 	struct input_iterator_tag
 	{
 	};
