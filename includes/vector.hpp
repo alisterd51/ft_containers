@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/04 00:18:41 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/04 22:47:36 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,12 +77,17 @@ namespace ft
 				typedef std::reverse_iterator<iterator> reverse_iterator;
 				typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 				// 23.2.4.1 construct/copy/destroy:
-				explicit vector(const Allocator& = Allocator())
+				explicit vector(const Allocator& = Allocator()) :
+					_m_start(),
+					_m_finish(),
+					_m_end_of_storage(),
+					_allocator()
 				{
 					return ;
 				}
 				explicit vector(size_type n, const T& value = T(), const Allocator& = Allocator())
 				{
+					_m_create_storage(n);
 					return ;
 				}
 				template <class InputIterator>
@@ -96,6 +101,7 @@ namespace ft
 				}
 				~vector()
 				{
+					_m_deallocate(_m_start, _m_end_of_storage - _m_start);
 					return ;
 				}
 				vector<T,Allocator>&	operator=(const vector<T,Allocator>& x);
@@ -115,20 +121,41 @@ namespace ft
 				// iterators:
 				iterator				begin()
 				{
-					return (iterator(_vector));
+					return (iterator(_m_start));
 				}
-				const_iterator			begin() const;
+				const_iterator			begin() const
+				{
+					return (const_iterator(_m_start));
+				}
 				iterator				end()
 				{
-					return (iterator(&_vector[_size]));
+					return (iterator(_m_finish));
 				}
-				const_iterator			end() const;
-				reverse_iterator		rbegin();
-				const_reverse_iterator	rbegin() const;
-				reverse_iterator		rend();
-				const_reverse_iterator	rend() const;
+				const_iterator			end() const
+				{
+					return (const_iterator(_m_finish));
+				}
+				reverse_iterator		rbegin()
+				{
+					return (reverse_iterator(_m_start));
+				}
+				const_reverse_iterator	rbegin() const
+				{
+					return (const_reverse_iterator(_m_start));
+				}
+				reverse_iterator		rend()
+				{
+					return (reverse_iterator(_m_finish));
+				}
+				const_reverse_iterator	rend() const
+				{
+					return (const_reverse_iterator(_m_finish));
+				}
 				// 23.2.4.2 capacity:
-				size_type				size() const;
+				size_type				size() const
+				{
+					return (size_type(_m_finish - _m_start));
+				}
 				size_type				max_size() const;
 				void					resize(size_type sz, T c = T())
 				{
@@ -142,9 +169,12 @@ namespace ft
 				}
 				size_type				capacity() const
 				{
-					return (_capacity);
+					return size_type(_m_end_of_storage - _m_start);
 				}
-				bool					empty() const;
+				bool					empty() const
+				{
+					return (begin() == end());
+				}
 				void					reserve(size_type n);
 				// element access:
 				reference				operator[](size_type n);
@@ -166,10 +196,35 @@ namespace ft
 				iterator				erase(iterator first, iterator last);
 				void					swap(vector<T,Allocator>&);
 				void					clear();
+				// operators
+				vector&					operator=(vector& rhs);
 			private:
-				pointer		_vector;
-				size_type	_capacity;
-				size_type	_size;
+				pointer _m_start;
+				pointer _m_finish;
+				pointer _m_end_of_storage;
+				Allocator	_allocator;//
+
+				void					_m_create_storage(size_t n)
+				{
+					_m_start = _m_allocate(n);
+					_m_finish = _m_start;
+					_m_end_of_storage = _m_start + n;
+					return ;
+				}
+				pointer	_m_allocate(size_t n)
+				{
+					if (n != 0)
+						return (_allocator.allocate());
+					else
+						return (pointer());
+				}
+				void	_m_deallocate(pointer p, size_t n)
+				{
+					if (p)
+						_allocator.deallocate(p, n);
+				}
+				//using _Base::_M_impl;//
+				//using _Base::_M_get_Tp_allocator;//
 		};
 	template <class T, class Allocator>
 		bool	operator==(const vector<T,Allocator>& x, const vector<T,Allocator>& y);
