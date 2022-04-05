@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/05 05:52:31 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/05 06:15:39 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,23 @@ namespace ft
 				//operator=
 				//n'existe pas en cpp 98
 				//base
+				iterator_type base() const
+				{
+					return (iter);
+				}
+				//operator*, operator->
+				reference	operator*() const
+				{
+					Iter tmp = iter;
+					return (*--tmp);
+				}
+				pointer		operator->() const
+				{
+					return (std::addressof(operator*()));
+				}
+				//operator[]
+
+				//
 				constexpr auto& operator*()
 				{
 					return (*std::prev(iter)); // <== returns the content of prev
