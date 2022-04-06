@@ -6,51 +6,94 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/04 22:47:36 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/06 21:27:20 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
-# include <iterator>
+#include "iterator.hpp"
 
-template <typename T>
-	class iterator_vector : std::iterator_traits<T*>
+namespace ft
 {
-	public:
-		// types:
-		typedef typename std::allocator<T>::pointer pointer;
-		// construct/copy/destroy:
-		iterator_vector(pointer p) :
-			_p(p)
+	template <class T>
+		class iterator_vector
 		{
-			return ;
-		}
-		// comparison
-		bool operator!=(iterator_vector const &rhs) const
-		{
-			return (this->_p != rhs._p);
-		}
-		iterator_vector& operator++()
-		{
-			this->_p = this->_p + 1;
-			return (*this);
-		}
-		iterator_vector operator++(int)
-		{
-			iterator_vector	post(*this);
-			operator++();
-			return (post);
-		}
-		T& operator* ()
-		{
-			return (*this->_p);
-		}
-	private:
-		pointer	_p;
-};
+			public:
+				//member types
+				typedef ptrdiff_t						difference_type;
+				typedef T								value_type;
+				typedef T*								pointer;
+				typedef T&								reference;
+				typedef ft::random_access_iterator_tag	iterator_category;
+				//constructor
+				//destructor
+				//operator=
+		};
+	//non member function overloads
 
+	template <class T, class Alloc = std::allocator<T> >
+		class vector
+		{
+			public:
+				//member types
+				typedef T														value_type;
+				typedef Alloc													allocator_type;
+				typedef typename allocator_type::reference						reference;
+				typedef typename allocator_type::const_reference				const_reference;
+				typedef typename allocator_type::pointer						pointer;
+				typedef typename allocator_type::const_pointer					const_pointer;
+				typedef iterator_vector<value_type>								iterator;
+				typedef iterator_vector<const value_type>						const_iterator;
+				typedef ft::reverse_iterator<iterator>							reverse_iterator;
+				typedef ft::reverse_iterator<const_iterator>					const_reverse_iterator;
+				typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
+				typedef std::size_t												size_type;
+				//constructor
+				explicit vector(const allocator_type& alloc = allocator_type()) :
+					_m_start(),
+					_m_finish(),
+					_m_end_of_storage(),
+					_allocator(alloc)
+				{
+					//Constructs an empty container, with no elements.
+				}
+				explicit vector(size_type n,
+						const value_type& val = value_type(),
+						const allocator_type& alloc = allocator_type()) :
+					_m_start(alloc.allocate(n * sizeof(val), 0)),
+					_m_finish(_m_start + n),
+					_m_end_of_storage(_m_finish),
+					_allocator(alloc)
+				{
+					for (size_type i = 0; i < n; ++i)
+					{
+						_m_start[i] = val;
+					}
+					//Constructs a container with n elements. Each element is a copy of val.
+				}
+				template <class InputIterator>
+					vector(InputIterator first, InputIterator last,
+							const allocator_type& alloc = allocator_type());
+				vector(const vector& x);
+				//destructor
+				//operator=
+				//iterators
+				//capacity
+				//element access
+				//modifiers
+				//allocator
+			private:
+				pointer	_m_start;
+				pointer	_m_finish;
+				pointer	_m_end_of_storage;
+				Alloc	_allocator;
+		};
+	//non member function overloads
+	//template specializations (non demmande)
+}
+/*
 # include <cstddef>
 # include <memory>
 
@@ -242,5 +285,5 @@ namespace ft
 	template <class T, class Allocator>
 		void	swap(vector<T,Allocator>& x, vector<T,Allocator>& y);
 }
-
+*/
 #endif

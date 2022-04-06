@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/06 00:33:30 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/06 20:42:04 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,16 +81,19 @@ namespace ft
 				typedef typename std::iterator_traits<Iter>::reference			reference;
 
 				//constructor
-				reverse_iterator() : iter()
+				reverse_iterator() :
+					iter()
 			{
 			}
-				explicit reverse_iterator(iterator_type x) : iter(x)
+				explicit reverse_iterator(iterator_type x) :
+					iter(x)
 			{
 			}
 				template<class U>
-					reverse_iterator(const reverse_iterator<U>& other) : iter(other.base())
-				{
-				}
+					reverse_iterator(const reverse_iterator<U>& other) :
+						iter(other.base())
+			{
+			}
 				//operator=
 				//base
 				iterator_type base() const
