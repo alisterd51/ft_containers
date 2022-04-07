@@ -6,27 +6,40 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/07 00:37:28 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/07 05:15:59 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
+#include <algorithm>
+#include <stdexcept>
 #include "iterator.hpp"
 
 namespace ft
 {
-	template <class T>
+	template <class T, class Alloc = std::allocator<T> >
 		class iterator_vector : public std::iterator<std::bidirectional_iterator_tag, T>
 		{
-			private:
-				T*	it;
 			public:
 				//member types
+				typedef T	value_type;
+				typedef T*	pointer;
 				//constructor
+				iterator_vector(pointer p) :
+					_it(p)
+				{
+				}
 				//destructor
 				//operator=
+				//operators
+				bool operator== (const iterator_vector<T>& rhs)
+				{
+					return (this->_it == rhs._it);
+				}
+			private:
+				pointer	_it;
 		};
 	//non member function overloads
 
@@ -53,9 +66,9 @@ namespace ft
 					_m_finish(),
 					_m_end_of_storage(),
 					_allocator(alloc)
-				{
-					//Constructs an empty container, with no elements.
-				}
+			{
+				//Constructs an empty container, with no elements.
+			}
 				explicit vector(size_type n,
 						const value_type& val = value_type(),
 						const allocator_type& alloc = allocator_type()) :
@@ -63,34 +76,34 @@ namespace ft
 					_m_finish(_m_start + n),
 					_m_end_of_storage(_m_finish),
 					_allocator(alloc)
+			{
+				for (size_type i = 0; i < n; ++i)
 				{
-					for (size_type i = 0; i < n; ++i)
-					{
-						_m_start[i] = val;
-					}
-					//Constructs a container with n elements. Each element is a copy of val.
+					_m_start[i] = val;
 				}
+				//Constructs a container with n elements. Each element is a copy of val.
+			}
 				template <class InputIterator>
 					vector(InputIterator first, InputIterator last,
 							const allocator_type& alloc = allocator_type()) :
-					_m_start(),
-					_m_finish(),
-					_m_end_of_storage(),
-					_allocator(alloc)
-					{
-						(void)first;
-						(void)last;
-						//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
-					}
+						_m_start(),
+						_m_finish(),
+						_m_end_of_storage(),
+						_allocator(alloc)
+			{
+				(void)first;
+				(void)last;
+				//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
+			}
 				vector(const vector& x) :
 					_m_start(),
 					_m_finish(),
 					_m_end_of_storage(),
 					_allocator(Alloc())
-				{
-					*this = x;
-					//Constructs a container with a copy of each of the elements in x, in the same order.
-				}
+			{
+				*this = x;
+				//Constructs a container with a copy of each of the elements in x, in the same order.
+			}
 				//destructor
 				~vector()
 				{
@@ -142,7 +155,7 @@ namespace ft
 				}
 				size_type max_size() const
 				{
-					return (size_type(allocator_type().max_size() / sizeof(value_type)));
+					return (size_type(allocator_type().max_size()));
 				}
 				void	resize(size_type n, value_type val = value_type())
 				{
@@ -158,6 +171,34 @@ namespace ft
 				{
 					return (size_type(_m_end_of_storage - _m_start));
 				}
+				bool	empty() const
+				{
+					return (begin() == end());
+				}
+				void	reserve(size_type n)
+				{
+					if (n > max_size())
+						throw std::length_error("vector::reserve");
+					if (n > capacity())
+					{
+						const size_type	old_size = size();
+						pointer			new_vector = allocator_type().allocate(n * sizeof(value_type), 0);
+						pointer			foo = _m_start;
+						pointer			bar = new_vector;
+
+						while (foo != _m_finish)
+						{
+							*bar = *foo;
+							allocator_type().destroy(foo);
+							++foo;
+							++bar;
+						}
+						allocator_type().deallocate(_m_start, _m_end_of_storage - _m_start);
+						_m_start = new_vector;
+						_m_finish = new_vector + old_size;
+						_m_end_of_storage = _m_start + n;
+					}
+				}
 				//element access
 				//modifiers
 				//allocator
@@ -168,6 +209,22 @@ namespace ft
 				Alloc	_allocator;
 		};
 	//non member function overloads
+	template <class T, class Alloc>
+		bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+		{
+			return (lhs.size() == rhs.size()
+					&& std::equal(lhs.begin(), lhs.end(), rhs.begin()));
+		}
+	template <class T, class Alloc>
+		bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
+	template <class T, class Alloc>
+		bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
+	template <class T, class Alloc>
+		bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
+	template <class T, class Alloc>
+		bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
+	template <class T, class Alloc>
+		bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs);
 	//template specializations (non demmande)
 }
 /*
