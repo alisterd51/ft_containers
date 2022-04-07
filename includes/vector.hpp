@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/07 05:15:59 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/07 19:37:07 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ namespace ft
 					_m_end_of_storage(),
 					_allocator(alloc)
 			{
+				std::cout << "construct empty" << std::endl;
 				//Constructs an empty container, with no elements.
 			}
 				explicit vector(size_type n,
@@ -77,6 +78,7 @@ namespace ft
 					_m_end_of_storage(_m_finish),
 					_allocator(alloc)
 			{
+				std::cout << "construct n elem, copy of val" << std::endl;
 				for (size_type i = 0; i < n; ++i)
 				{
 					_m_start[i] = val;
@@ -91,6 +93,7 @@ namespace ft
 						_m_end_of_storage(),
 						_allocator(alloc)
 			{
+				std::cout << "construct range" << std::endl;
 				(void)first;
 				(void)last;
 				//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
@@ -101,12 +104,14 @@ namespace ft
 					_m_end_of_storage(),
 					_allocator(Alloc())
 			{
+				std::cout << "construct by copy" << std::endl;
 				*this = x;
 				//Constructs a container with a copy of each of the elements in x, in the same order.
 			}
 				//destructor
 				~vector()
 				{
+				std::cout << "destruct" << std::endl;
 					if (_m_start)
 						allocator_type().deallocate(_m_start, _m_end_of_storage - _m_start);
 				}
@@ -200,7 +205,66 @@ namespace ft
 					}
 				}
 				//element access
+				reference		operator[](size_type n)
+				{
+					return (*(_m_start + n));
+				}
+				const_reference	operator[](size_type n) const
+				{
+					return (*(_m_start + n));
+				}
+				reference		at(size_type n)
+				{
+					if (n >= size())
+						throw std::out_of_range("vector::at");
+					return (*(_m_start + n));
+				}
+				const_reference	at(size_type n) const
+				{
+					if (n >= size())
+						throw std::out_of_range("vector::at");
+					return (*(_m_start + n));
+				}
+				reference		front()
+				{
+					return (*_m_start);
+				}
+				const_reference	front() const
+				{
+					return (*_m_start);
+				}
+				reference		back()
+				{
+					return (*(_m_finish - 1));
+				}
+				const_reference	back() const
+				{
+					return (*(_m_finish - 1));
+				}
 				//modifiers
+				template <class InputIterator>
+					void	assign(InputIterator first, InputIterator last)
+					{
+						erase(begin(), end());
+						insert(begin(), first, last);
+					}
+				void	assign(size_type n, const value_type& val)
+				{
+					erase(begin(), end());
+					insert(begin(), n, val);
+				}
+				void	push_back(const value_type& val)
+				{
+					if (size() + 1 > capacity())
+						reserve(size() + 1);
+					*_m_finish = val;
+					++_m_finish;
+				}
+				void pop_back()
+				{
+					allocator_type().destroy(_m_finish - 1);
+					--_m_finish;
+				}
 				//allocator
 			private:
 				pointer	_m_start;
