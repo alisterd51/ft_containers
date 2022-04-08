@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/08 17:10:05 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/08 17:57:31 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,9 +122,13 @@ namespace ft
 				}
 				//Constructs a container with n elements. Each element is a copy of val.
 			}
+				//thanks https://stackoverflow.com/questions/11898657/enable-if-iterator-as-a-default-template-parameter
+				//and
+				//https://stackoverflow.com/questions/15598939/how-do-i-use-stdis-integral-to-select-an-implementation
 				template <class InputIterator>
-					vector(typename ft::enable_if<!std::is_same<typename std::iterator_traits<InputIterator>::value_type, InputIterator>::value>::type first,
-							InputIterator last, const allocator_type& alloc = allocator_type()) :
+					vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+							typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = NULL,
+							typename std::iterator_traits<InputIterator>::iterator_category* = NULL) :
 						_m_start(),
 						_m_finish(),
 						_m_end_of_storage(),
