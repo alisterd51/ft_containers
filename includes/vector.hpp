@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/08 01:49:36 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/08 08:29:27 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,10 @@ namespace ft
 				difference_type	operator-(const iterator_vector<T>& rhs)
 				{
 					return (this->_it - rhs._it);
+				}
+				iterator_vector	operator+(const difference_type& rhs)
+				{
+					return (iterator_vector(this->_it + rhs));
 				}
 			private:
 				pointer	_it;
@@ -314,7 +318,56 @@ namespace ft
 					_m_finish += n;
 				}
 				template <class InputIterator>
-					void	insert(iterator position, InputIterator first, InputIterator last);
+					void	insert(iterator position, InputIterator first, InputIterator last)
+					{
+						const difference_type	n = last - first;
+						const difference_type	diff = position - iterator(_m_start);
+
+						if (size() + n > capacity())
+							reserve(size() + n);
+						for (pointer i = _m_finish + n - 1, j = _m_finish - 1; i >= _m_start ; --i)
+						{
+							if (i >= _m_start + diff + n || i < _m_start + diff)
+							{
+								*i = *j;
+								--j;
+							}
+							else
+							{
+								*i = *first;
+								++first;
+							}
+						}
+						_m_finish += n;
+					}
+				iterator	erase(iterator position)
+				{
+					const difference_type	diff = position - iterator(_m_start);
+					pointer	p = _m_start + diff;
+
+					allocator_type().destroy(p);
+					while (p != _m_finish - 1)
+					{
+						*p = *(p + 1);
+						++p;
+					}
+					--_m_finish;
+					return (iterator(_m_start + diff));
+				}
+				iterator	erase(iterator first, iterator last)
+				{
+					const difference_type	n = last - first;
+					const difference_type	diff = first - iterator(_m_start);
+					pointer	p = _m_start + diff;
+
+					for (difference_type i = 0; i < n; ++i)
+					{
+						allocator_type().destroy(p + i);
+						*(p + i) = *(p + i + n);
+					}
+					_m_finish -= n;
+					return (iterator(_m_start + diff));
+				}
 				//allocator
 			private:
 				pointer	_m_start;
