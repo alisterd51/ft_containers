@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/08 11:37:57 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/08 17:10:05 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <stdexcept>
 #include "iterator.hpp"
 #include "type_traits.hpp"
+
+#include <limits>
 
 namespace ft
 {
@@ -121,8 +123,8 @@ namespace ft
 				//Constructs a container with n elements. Each element is a copy of val.
 			}
 				template <class InputIterator>
-					vector(InputIterator first, InputIterator last,
-							const allocator_type& alloc = allocator_type()) :
+					vector(typename ft::enable_if<!std::is_same<typename std::iterator_traits<InputIterator>::value_type, InputIterator>::value>::type first,
+							InputIterator last, const allocator_type& alloc = allocator_type()) :
 						_m_start(),
 						_m_finish(),
 						_m_end_of_storage(),
