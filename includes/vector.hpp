@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/07 19:37:07 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/08 01:49:36 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,15 @@ namespace ft
 	template <class T, class Alloc = std::allocator<T> >
 		class iterator_vector : public std::iterator<std::bidirectional_iterator_tag, T>
 		{
+			private:
+				typedef std::iterator<std::bidirectional_iterator_tag, T>	iterator_base;
 			public:
 				//member types
-				typedef T	value_type;
-				typedef T*	pointer;
+				using typename iterator_base::value_type;
+				using typename iterator_base::difference_type;
+				using typename iterator_base::pointer;
+				using typename iterator_base::reference;
+				using typename iterator_base::iterator_category;
 				//constructor
 				iterator_vector(pointer p) :
 					_it(p)
@@ -37,6 +42,10 @@ namespace ft
 				bool operator== (const iterator_vector<T>& rhs)
 				{
 					return (this->_it == rhs._it);
+				}
+				difference_type	operator-(const iterator_vector<T>& rhs)
+				{
+					return (this->_it - rhs._it);
 				}
 			private:
 				pointer	_it;
@@ -248,23 +257,64 @@ namespace ft
 						erase(begin(), end());
 						insert(begin(), first, last);
 					}
-				void	assign(size_type n, const value_type& val)
+				void		assign(size_type n, const value_type& val)
 				{
 					erase(begin(), end());
 					insert(begin(), n, val);
 				}
-				void	push_back(const value_type& val)
+				void		push_back(const value_type& val)
 				{
 					if (size() + 1 > capacity())
 						reserve(size() + 1);
 					*_m_finish = val;
 					++_m_finish;
 				}
-				void pop_back()
+				void		pop_back()
 				{
 					allocator_type().destroy(_m_finish - 1);
 					--_m_finish;
 				}
+				iterator	insert(iterator position, const value_type& val)
+				{
+					const difference_type	diff = position - iterator(_m_start);
+
+					if (size() + 1 > capacity())
+						reserve(size() + 1);
+					pointer	new_position = _m_start + diff;
+					value_type	tmp_next = val;
+
+					for (pointer i = new_position; i <= _m_finish; ++i)
+					{
+						value_type	tmp_curent = tmp_next;
+
+						tmp_next = *i;
+						*i = tmp_curent;
+					}
+					++_m_finish;
+					return (new_position);
+				}
+				void		insert(iterator position, size_type n, const value_type& val)
+				{
+					const difference_type	diff = position - iterator(_m_start);
+
+					if (size() + n > capacity())
+						reserve(size() + n);
+					for (pointer i = _m_finish + n - 1, j = _m_finish - 1; i >= _m_start ; --i)
+					{
+						if (i >= _m_start + diff + n || i < _m_start + diff)
+						{
+							*i = *j;
+							--j;
+						}
+						else
+						{
+							*i = val;
+						}
+					}
+					_m_finish += n;
+				}
+				template <class InputIterator>
+					void	insert(iterator position, InputIterator first, InputIterator last);
 				//allocator
 			private:
 				pointer	_m_start;
