@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/08 17:57:31 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/08 19:47:33 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <limits>
 #include "iterator.hpp"
 #include "type_traits.hpp"
 
-#include <limits>
 
 namespace ft
 {
@@ -67,6 +67,17 @@ namespace ft
 				{
 					iterator_vector	temp = *this;
 					++(*this);
+					return (temp);
+				}
+				iterator_vector&	operator--()
+				{
+					_it = _it - 1;
+					return (*this);
+				}
+				iterator_vector		operator--(int)
+				{
+					iterator_vector	temp = *this;
+					--(*this);
 					return (temp);
 				}
 				reference	operator*()
@@ -161,6 +172,7 @@ namespace ft
 				vector&	operator=(const vector& x)
 				{
 					(void)x;
+					return (*this);
 				}
 				//iterators
 				iterator begin()
@@ -285,7 +297,9 @@ namespace ft
 				}
 				//modifiers
 				template <class InputIterator>
-					void	assign(InputIterator first, InputIterator last)
+					void	assign(InputIterator first, InputIterator last,
+							typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = NULL,
+							typename std::iterator_traits<InputIterator>::iterator_category* = NULL)
 					{
 						erase(begin(), end());
 						insert(begin(), first, last);
