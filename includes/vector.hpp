@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/08 08:29:27 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/08 11:37:57 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "iterator.hpp"
+#include "type_traits.hpp"
 
 namespace ft
 {
@@ -43,6 +44,10 @@ namespace ft
 				{
 					return (this->_it == rhs._it);
 				}
+				bool operator!= (const iterator_vector<T>& rhs)
+				{
+					return (this->_it != rhs._it);
+				}
 				difference_type	operator-(const iterator_vector<T>& rhs)
 				{
 					return (this->_it - rhs._it);
@@ -50,6 +55,25 @@ namespace ft
 				iterator_vector	operator+(const difference_type& rhs)
 				{
 					return (iterator_vector(this->_it + rhs));
+				}
+				iterator_vector&	operator++()
+				{
+					_it = _it + 1;
+					return (*this);
+				}
+				iterator_vector		operator++(int)
+				{
+					iterator_vector	temp = *this;
+					++(*this);
+					return (temp);
+				}
+				reference	operator*()
+				{
+					return (*_it);
+				}
+				pointer	operator->()
+				{
+					return (_it);
 				}
 			private:
 				pointer	_it;
@@ -80,7 +104,6 @@ namespace ft
 					_m_end_of_storage(),
 					_allocator(alloc)
 			{
-				std::cout << "construct empty" << std::endl;
 				//Constructs an empty container, with no elements.
 			}
 				explicit vector(size_type n,
@@ -91,7 +114,6 @@ namespace ft
 					_m_end_of_storage(_m_finish),
 					_allocator(alloc)
 			{
-				std::cout << "construct n elem, copy of val" << std::endl;
 				for (size_type i = 0; i < n; ++i)
 				{
 					_m_start[i] = val;
@@ -106,7 +128,6 @@ namespace ft
 						_m_end_of_storage(),
 						_allocator(alloc)
 			{
-				std::cout << "construct range" << std::endl;
 				(void)first;
 				(void)last;
 				//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
@@ -117,16 +138,18 @@ namespace ft
 					_m_end_of_storage(),
 					_allocator(Alloc())
 			{
-				std::cout << "construct by copy" << std::endl;
 				*this = x;
 				//Constructs a container with a copy of each of the elements in x, in the same order.
 			}
 				//destructor
 				~vector()
 				{
-				std::cout << "destruct" << std::endl;
 					if (_m_start)
+					{
+						for (pointer i = _m_start; i < _m_finish; ++i)
+							allocator_type().destroy(i);
 						allocator_type().deallocate(_m_start, _m_end_of_storage - _m_start);
+					}
 				}
 				//operator=
 				vector&	operator=(const vector& x)
@@ -367,6 +390,28 @@ namespace ft
 					}
 					_m_finish -= n;
 					return (iterator(_m_start + diff));
+				}
+				void	swap(vector& x)
+				{
+					pointer	tmp_start = x._m_start;
+					pointer	tmp_finish = x._m_finish;
+					pointer	tmp_end_of_storage = x._m_end_of_storage;
+					Alloc	tmp_allocator = x._allocator;
+
+					x._m_start = this->_m_start;
+					x._m_finish = this->_m_finish;
+					x._m_end_of_storage = this->_m_end_of_storage;
+					x._allocator = this->_allocator;
+					this->_m_start = tmp_start;
+					this->_m_finish = tmp_finish;
+					this->_m_end_of_storage = tmp_end_of_storage;
+					this->_allocator = tmp_allocator;
+				}
+				void	clear()
+				{
+					for (pointer i = _m_start; i < _m_finish; ++i)
+						allocator_type().destroy(i);
+					_m_finish = _m_start;
 				}
 				//allocator
 			private:
