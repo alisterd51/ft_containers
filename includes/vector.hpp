@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/09 02:01:38 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/14 06:02:12 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,65 +33,139 @@ namespace ft
 				using typename iterator_base::pointer;
 				using typename iterator_base::reference;
 				using typename iterator_base::iterator_category;
-				//constructor
+				//default-constructible, copy-constructible, copy-assignable and destructible
+				iterator_vector() :
+					_p()
+				{
+				}
+				iterator_vector(const iterator_vector& it) :
+					_p(it._p)
+				{
+				}
+				iterator_vector&	operator= (const iterator_vector& rhs)
+				{
+					if (*this != rhs)
+					{
+						this->_p = rhs._p;
+					}
+					return (*this);
+				}
+				~iterator_vector()
+				{
+				}
+				//
 				iterator_vector(pointer p) :
-					_it(p)
+					_p(p)
 				{
 				}
-				//destructor
-				//operator=
-				//operators
-				bool operator== (const iterator_vector<T>& rhs)
+				//a == b, a != b
+				bool	operator==(const iterator_vector<T>& rhs) const
 				{
-					return (this->_it == rhs._it);
+					return (this->_p == rhs._p);
 				}
-				bool operator!= (const iterator_vector<T>& rhs)
+				bool	operator!=(const iterator_vector<T>& rhs) const
 				{
-					return (this->_it != rhs._it);
+					return (this->_p != rhs._p);
 				}
-				difference_type	operator-(const iterator_vector<T>& rhs)
+				//*a, a->m
+				reference	operator*()
 				{
-					return (this->_it - rhs._it);
+					return (*_p);
 				}
-				iterator_vector	operator+(const difference_type& rhs)
+				pointer		operator->()
 				{
-					return (iterator_vector(this->_it + rhs));
+					return (_p);
 				}
+				//++a, a++
 				iterator_vector&	operator++()
 				{
-					_it = _it + 1;
+					_p = _p + 1;
 					return (*this);
 				}
 				iterator_vector		operator++(int)
 				{
 					iterator_vector	temp = *this;
+
 					++(*this);
 					return (temp);
 				}
+				//--a, a--
 				iterator_vector&	operator--()
 				{
-					_it = _it - 1;
+					_p = _p - 1;
 					return (*this);
 				}
 				iterator_vector		operator--(int)
 				{
 					iterator_vector	temp = *this;
+
 					--(*this);
 					return (temp);
 				}
-				reference	operator*()
+				//a + n, n + a, a - n, a - b
+				iterator_vector	operator+(difference_type n) const
 				{
-					return (*_it);
+					return (iterator_vector(this->_p + n));
 				}
-				pointer	operator->()
+				iterator_vector	operator-(difference_type n) const
 				{
-					return (_it);
+					return (iterator_vector(this->_p - n));
+				}
+				difference_type	operator-(const iterator_vector<T>& rhs) const
+				{
+					return (this->_p - rhs._p);
+				}
+				//a < b, a > b, a <= b, a >= b
+				bool	operator<(const iterator_vector<T>& rhs) const
+				{
+					return (this->_p < rhs._p);
+				}
+				bool	operator>(const iterator_vector<T>& rhs) const
+				{
+					return (this->_p > rhs._p);
+				}
+				bool	operator<=(const iterator_vector<T>& rhs) const
+				{
+					return (this->_p <= rhs._p);
+				}
+				bool	operator>=(const iterator_vector<T>& rhs) const
+				{
+					return (this->_p >= rhs._p);
+				}
+				//a += n, a -= n
+				iterator_vector&	operator+=(const difference_type n)
+				{
+					this->_p += n;
+					return (*this);
+				}
+				iterator_vector&	operator-=(const difference_type n)
+				{
+					this->_p -= n;
+					return (*this);
+				}
+				//a[n]
+				reference	operator[](difference_type n)
+				{
+					return (*(_p + n));
 				}
 			private:
-				pointer	_it;
+				pointer	_p;
 		};
-	//non member function overloads
+	//n + a, n - a
+	template <class T, class Alloc>
+		iterator_vector<T, Alloc> operator+(const typename iterator_vector<T,Alloc>::difference_type lhs, const iterator_vector<T,Alloc>& rhs)
+		{
+			return (rhs + lhs);
+		}
+	template <class T, class Alloc>
+		iterator_vector<T, Alloc> operator-(const typename iterator_vector<T,Alloc>::difference_type lhs, const iterator_vector<T,Alloc>& rhs)
+		{
+			return (rhs - lhs);
+		}
+}
 
+namespace ft
+{
 	template <class T, class Alloc = std::allocator<T> >
 		class vector
 		{
@@ -359,28 +433,19 @@ namespace ft
 					}
 					_m_finish += n;
 				}
-				template <class InputIterator>
-					void	insert(iterator position, InputIterator first, InputIterator last)
-					{
-						const difference_type	n = last - first;
-						const difference_type	diff = position - iterator(_m_start);
-
-						if (size() + n > capacity())
-							reserve(size() + n);
-						for (pointer i = _m_finish + n - 1, j = _m_finish - 1; i >= _m_start ; --i)
+				template<typename InputIterator>
+					void	insert(iterator pos, InputIterator first, InputIterator last, std::input_iterator_tag* = NULL)
+					{                                                                         
+						if (pos == end())
 						{
-							if (i >= _m_start + diff + n || i < _m_start + diff)
-							{
-								*i = *j;
-								--j;
-							}
-							else
-							{
-								*i = *first;
-								++first;
-							}
+							for (; first != last; ++first)
+								insert(end(), *first);
 						}
-						_m_finish += n;
+						else if (first != last)
+						{
+							vector tmp(first, last, allocator_type());
+							insert(pos, iterator_vector<T>(tmp.begin()), iterator_vector<T>(tmp.end()));
+						}
 					}
 				iterator	erase(iterator position)
 				{
