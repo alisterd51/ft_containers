@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/14 06:02:12 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/15 11:11:09 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -434,7 +434,9 @@ namespace ft
 					_m_finish += n;
 				}
 				template<typename InputIterator>
-					void	insert(iterator pos, InputIterator first, InputIterator last, std::input_iterator_tag* = NULL)
+					void	insert(iterator pos, InputIterator first, InputIterator last,
+							typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = NULL,
+							typename std::iterator_traits<InputIterator>::iterator_category* = NULL)
 					{                                                                         
 						if (pos == end())
 						{

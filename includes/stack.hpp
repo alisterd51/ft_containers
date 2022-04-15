@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:21:42 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/06 01:09:18 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/15 10:47:58 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,43 +63,48 @@ namespace ft
 				{
 					c.pop_back();
 				}
+				//getter
+				Container	_getC() const
+				{
+					return (c);
+				}
 		};
 	//non-member functions
 	template <class T, class Container>
 		bool operator==(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x.c == y.c);
+			return (x._getC() == y._getC());
 		}
 	template <class T, class Container>
 		bool operator< (const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x.c < y.c);
+			return (x._getC() < y._getC());
 		}
 	template <class T, class Container>
 		bool operator!=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x.c != y.c);
+			return (x._getC() != y._getC());
 		}
 	template <class T, class Container>
 		bool operator> (const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x.c > y.c);
+			return (x._getC() > y._getC());
 		}
 	template <class T, class Container>
 		bool operator>=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x.c >= y.c);
+			return (x._getC() >= y._getC());
 		}
 	template <class T, class Container>
 		bool operator<=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x.c <= y.c);
+			return (x._getC() <= y._getC());
 		}
 }
 
