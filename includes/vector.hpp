@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/15 11:11:09 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/16 19:16:01 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ namespace ft
 				{
 				}
 				iterator_vector(const iterator_vector& it) :
-					_p(it._p)
+					_p(it.base())
 				{
 				}
 				iterator_vector&	operator= (const iterator_vector& rhs)
 				{
 					if (*this != rhs)
 					{
-						this->_p = rhs._p;
+						this->base = rhs.base;
 					}
 					return (*this);
 				}
@@ -58,14 +58,22 @@ namespace ft
 					_p(p)
 				{
 				}
+//				template<typename _Iter>
+//					iterator_vector(iterator_vector<_Iter, typename __enable_if<(std::__are_same<_Iter, typename _Container::pointer>::__value), _Container>::__type>& __i)
+//					: _M_current(__i.base()) { }
+				//
+				pointer	base() const
+				{
+					return (_p);
+				}
 				//a == b, a != b
 				bool	operator==(const iterator_vector<T>& rhs) const
 				{
-					return (this->_p == rhs._p);
+					return (this->base() == rhs.base());
 				}
 				bool	operator!=(const iterator_vector<T>& rhs) const
 				{
-					return (this->_p != rhs._p);
+					return (this->base() != rhs.base());
 				}
 				//*a, a->m
 				reference	operator*()
@@ -118,19 +126,19 @@ namespace ft
 				//a < b, a > b, a <= b, a >= b
 				bool	operator<(const iterator_vector<T>& rhs) const
 				{
-					return (this->_p < rhs._p);
+					return (this->base() < rhs.base());
 				}
 				bool	operator>(const iterator_vector<T>& rhs) const
 				{
-					return (this->_p > rhs._p);
+					return (this->base() > rhs.base());
 				}
 				bool	operator<=(const iterator_vector<T>& rhs) const
 				{
-					return (this->_p <= rhs._p);
+					return (this->base() <= rhs.base());
 				}
 				bool	operator>=(const iterator_vector<T>& rhs) const
 				{
-					return (this->_p >= rhs._p);
+					return (this->base() >= rhs.base());
 				}
 				//a += n, a -= n
 				iterator_vector&	operator+=(const difference_type n)
@@ -151,18 +159,198 @@ namespace ft
 			private:
 				pointer	_p;
 		};
-	//n + a, n - a
+	//n + a
 	template <class T, class Alloc>
 		iterator_vector<T, Alloc> operator+(const typename iterator_vector<T,Alloc>::difference_type lhs, const iterator_vector<T,Alloc>& rhs)
 		{
 			return (rhs + lhs);
 		}
-	template <class T, class Alloc>
-		iterator_vector<T, Alloc> operator-(const typename iterator_vector<T,Alloc>::difference_type lhs, const iterator_vector<T,Alloc>& rhs)
-		{
-			return (rhs - lhs);
-		}
 }
+
+/*
+namespace ft
+{
+	template<typename _Iterator, typename _Container>
+		class __normal_iterator
+		{
+			protected:
+				_Iterator _M_current;
+
+				typedef std::iterator_traits<_Iterator>		__traits_type;
+
+			public:
+				typedef _Iterator					iterator_type;
+				typedef typename __traits_type::iterator_category iterator_category;
+				typedef typename __traits_type::value_type  	value_type;
+				typedef typename __traits_type::difference_type 	difference_type;
+				typedef typename __traits_type::reference 	reference;
+				typedef typename __traits_type::pointer   	pointer;
+
+
+				__normal_iterator()
+					: _M_current(_Iterator()) { }
+
+				explicit
+					__normal_iterator(const _Iterator& __i)
+					: _M_current(__i) { }
+
+				// Allow iterator to const_iterator conversion
+				template<typename _Iter>
+					__normal_iterator(const __normal_iterator<_Iter,
+							typename __enable_if<
+							(std::__are_same<_Iter, typename _Container::pointer>::__value),
+							_Container>::__type>& __i)
+					: _M_current(__i.base()) { }
+
+				// Forward iterator requirements
+					reference
+					operator*() const
+					{ return *_M_current; }
+
+					pointer
+					operator->() const
+					{ return _M_current; }
+
+					__normal_iterator&
+					operator++()
+					{
+						++_M_current;
+						return *this;
+					}
+
+					__normal_iterator
+					operator++(int)
+					{ return __normal_iterator(_M_current++); }
+
+					__normal_iterator&
+					operator--()
+					{
+						--_M_current;
+						return *this;
+					}
+
+					__normal_iterator
+					operator--(int)
+					{ return __normal_iterator(_M_current--); }
+
+					reference
+					operator[](difference_type __n) const
+					{ return _M_current[__n]; }
+
+					__normal_iterator&
+					operator+=(difference_type __n)
+					{ _M_current += __n; return *this; }
+
+					__normal_iterator
+					operator+(difference_type __n) const
+					{ return __normal_iterator(_M_current + __n); }
+
+					__normal_iterator&
+					operator-=(difference_type __n)
+					{ _M_current -= __n; return *this; }
+
+					__normal_iterator
+					operator-(difference_type __n) const
+					{ return __normal_iterator(_M_current - __n); }
+
+					const _Iterator&
+					base() const
+					{ return _M_current; }
+		};
+
+	template<typename _IteratorL, typename _IteratorR, typename _Container>
+		inline bool
+		operator==(const __normal_iterator<_IteratorL, _Container>& __lhs,
+				const __normal_iterator<_IteratorR, _Container>& __rhs)
+		{ return __lhs.base() == __rhs.base(); }
+
+	template<typename _Iterator, typename _Container>
+		inline bool
+		operator==(const __normal_iterator<_Iterator, _Container>& __lhs,
+				const __normal_iterator<_Iterator, _Container>& __rhs)
+		{ return __lhs.base() == __rhs.base(); }
+
+	template<typename _IteratorL, typename _IteratorR, typename _Container>
+		inline bool
+		operator!=(const __normal_iterator<_IteratorL, _Container>& __lhs,
+				const __normal_iterator<_IteratorR, _Container>& __rhs)
+		{ return __lhs.base() != __rhs.base(); }
+
+	template<typename _Iterator, typename _Container>
+		inline bool
+		operator!=(const __normal_iterator<_Iterator, _Container>& __lhs,
+				const __normal_iterator<_Iterator, _Container>& __rhs)
+		{ return __lhs.base() != __rhs.base(); }
+
+	// Random access iterator requirements
+	template<typename _IteratorL, typename _IteratorR, typename _Container>
+		inline bool
+		operator<(const __normal_iterator<_IteratorL, _Container>& __lhs,
+				const __normal_iterator<_IteratorR, _Container>& __rhs)
+		{ return __lhs.base() < __rhs.base(); }
+
+	template<typename _Iterator, typename _Container>
+		inline bool
+		operator<(const __normal_iterator<_Iterator, _Container>& __lhs,
+				const __normal_iterator<_Iterator, _Container>& __rhs)
+		{ return __lhs.base() < __rhs.base(); }
+
+	template<typename _IteratorL, typename _IteratorR, typename _Container>
+		inline bool
+		operator>(const __normal_iterator<_IteratorL, _Container>& __lhs,
+				const __normal_iterator<_IteratorR, _Container>& __rhs)
+		{ return __lhs.base() > __rhs.base(); }
+
+	template<typename _Iterator, typename _Container>
+		inline bool
+		operator>(const __normal_iterator<_Iterator, _Container>& __lhs,
+				const __normal_iterator<_Iterator, _Container>& __rhs)
+		{ return __lhs.base() > __rhs.base(); }
+
+	template<typename _IteratorL, typename _IteratorR, typename _Container>
+		inline bool
+		operator<=(const __normal_iterator<_IteratorL, _Container>& __lhs,
+				const __normal_iterator<_IteratorR, _Container>& __rhs)
+		{ return __lhs.base() <= __rhs.base(); }
+
+	template<typename _Iterator, typename _Container>
+		inline bool
+		operator<=(const __normal_iterator<_Iterator, _Container>& __lhs,
+				const __normal_iterator<_Iterator, _Container>& __rhs)
+		{ return __lhs.base() <= __rhs.base(); }
+
+	template<typename _IteratorL, typename _IteratorR, typename _Container>
+		inline bool
+		operator>=(const __normal_iterator<_IteratorL, _Container>& __lhs,
+				const __normal_iterator<_IteratorR, _Container>& __rhs)
+		{ return __lhs.base() >= __rhs.base(); }
+
+	template<typename _Iterator, typename _Container>
+		inline bool
+		operator>=(const __normal_iterator<_Iterator, _Container>& __lhs,
+				const __normal_iterator<_Iterator, _Container>& __rhs)
+		{ return __lhs.base() >= __rhs.base(); }
+
+	template<typename _IteratorL, typename _IteratorR, typename _Container>
+		inline typename __normal_iterator<_IteratorL, _Container>::difference_type
+		operator-(const __normal_iterator<_IteratorL, _Container>& __lhs,
+				const __normal_iterator<_IteratorR, _Container>& __rhs)
+		{ return __lhs.base() - __rhs.base(); }
+
+	template<typename _Iterator, typename _Container>
+		inline typename __normal_iterator<_Iterator, _Container>::difference_type
+		operator-(const __normal_iterator<_Iterator, _Container>& __lhs,
+				const __normal_iterator<_Iterator, _Container>& __rhs)
+		{ return __lhs.base() - __rhs.base(); }
+
+	template<typename _Iterator, typename _Container>
+		inline __normal_iterator<_Iterator, _Container>
+		operator+(typename __normal_iterator<_Iterator, _Container>::difference_type
+				__n, const __normal_iterator<_Iterator, _Container>& __i)
+		{ return __normal_iterator<_Iterator, _Container>(__i.base() + __n); }
+
+}
+*/
 
 namespace ft
 {
@@ -177,10 +365,12 @@ namespace ft
 				typedef typename allocator_type::const_reference				const_reference;
 				typedef typename allocator_type::pointer						pointer;
 				typedef typename allocator_type::const_pointer					const_pointer;
-				typedef iterator_vector<value_type>								iterator;
-				typedef iterator_vector<const value_type>						const_iterator;
-				typedef ft::reverse_iterator<iterator>							reverse_iterator;
-				typedef ft::reverse_iterator<const_iterator>					const_reverse_iterator;
+				//				typedef iterator_vector<value_type>								iterator;
+				//				typedef iterator_vector<const value_type>						const_iterator;
+				typedef __gnu_cxx::__normal_iterator<pointer, vector>			iterator;
+				typedef __gnu_cxx::__normal_iterator<const_pointer, vector>		const_iterator;
+				typedef std::reverse_iterator<iterator>							reverse_iterator;
+				typedef std::reverse_iterator<const_iterator>					const_reverse_iterator;
 				typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
 				typedef std::size_t												size_type;
 				//constructor
@@ -266,19 +456,19 @@ namespace ft
 				}
 				reverse_iterator rbegin()
 				{
-					return (reverse_iterator(_m_start));
+					return (reverse_iterator(iterator(_m_start)));
 				}
 				const_reverse_iterator rbegin() const
 				{
-					return (const_reverse_iterator(_m_start));
+					return (const_reverse_iterator(const_iterator(_m_start)));
 				}
 				reverse_iterator rend()
 				{
-					return (reverse_iterator(_m_finish));
+					return (reverse_iterator(iterator(_m_finish)));
 				}
 				const_reverse_iterator rend() const
 				{
-					return (const_reverse_iterator(_m_finish));
+					return (const_reverse_iterator(const_iterator(_m_finish)));
 				}
 				//capacity
 				size_type size() const
@@ -411,7 +601,7 @@ namespace ft
 						*i = tmp_curent;
 					}
 					++_m_finish;
-					return (new_position);
+					return (iterator(new_position));
 				}
 				void		insert(iterator position, size_type n, const value_type& val)
 				{
@@ -437,7 +627,7 @@ namespace ft
 					void	insert(iterator pos, InputIterator first, InputIterator last,
 							typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = NULL,
 							typename std::iterator_traits<InputIterator>::iterator_category* = NULL)
-					{                                                                         
+					{
 						if (pos == end())
 						{
 							for (; first != last; ++first)
@@ -446,9 +636,20 @@ namespace ft
 						else if (first != last)
 						{
 							vector tmp(first, last, allocator_type());
-							insert(pos, iterator_vector<T>(tmp.begin()), iterator_vector<T>(tmp.end()));
+							insert(pos, iterator(tmp.begin()), iterator(tmp.end()));
 						}
 					}
+				/*template<typename _Integer>
+				  void
+				  _M_insert_dispatch(iterator __pos, _Integer __n, _Integer __val,
+				  std::__true_type)
+				  { _M_fill_insert(__pos, __n, __val); }
+				  template<typename InputIterator>
+				  void	insert(iterator pos, InputIterator first, InputIterator last)
+				  {
+				  typedef typename std::__is_integer<_InputIterator>::__type _Integral;
+				  _M_insert_dispatch(__position, __first, __last, _Integral());
+				  }*/
 				iterator	erase(iterator position)
 				{
 					const difference_type	diff = position - iterator(_m_start);
