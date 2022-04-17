@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/16 19:16:01 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/17 17:45:42 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -392,7 +392,7 @@ namespace ft
 			{
 				for (size_type i = 0; i < n; ++i)
 				{
-					_m_start[i] = val;
+					*(_m_start + i) = val;
 				}
 				//Constructs a container with n elements. Each element is a copy of val.
 			}
@@ -434,7 +434,7 @@ namespace ft
 				//operator=
 				vector&	operator=(const vector& x)
 				{
-					(void)x;
+					assign(x.begin(), x.end());
 					return (*this);
 				}
 				//iterators
