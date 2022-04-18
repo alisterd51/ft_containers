@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/17 17:45:42 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/18 15:18:43 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include "iterator.hpp"
 #include "type_traits.hpp"
 #include "algorithm.hpp"
-
+/*
 namespace ft
 {
 	template <class T, class Alloc = std::allocator<T> >
@@ -75,7 +75,7 @@ namespace ft
 				{
 					return (this->base() != rhs.base());
 				}
-				//*a, a->m
+				// *a, a->m
 				reference	operator*()
 				{
 					return (*_p);
@@ -166,7 +166,7 @@ namespace ft
 			return (rhs + lhs);
 		}
 }
-
+*/
 /*
 namespace ft
 {
@@ -365,8 +365,6 @@ namespace ft
 				typedef typename allocator_type::const_reference				const_reference;
 				typedef typename allocator_type::pointer						pointer;
 				typedef typename allocator_type::const_pointer					const_pointer;
-				//				typedef iterator_vector<value_type>								iterator;
-				//				typedef iterator_vector<const value_type>						const_iterator;
 				typedef __gnu_cxx::__normal_iterator<pointer, vector>			iterator;
 				typedef __gnu_cxx::__normal_iterator<const_pointer, vector>		const_iterator;
 				typedef std::reverse_iterator<iterator>							reverse_iterator;
@@ -385,15 +383,12 @@ namespace ft
 				explicit vector(size_type n,
 						const value_type& val = value_type(),
 						const allocator_type& alloc = allocator_type()) :
-					_m_start(allocator_type().allocate(n * sizeof(val), 0)),
-					_m_finish(_m_start + n),
-					_m_end_of_storage(_m_finish),
+					_m_start(),
+					_m_finish(),
+					_m_end_of_storage(),
 					_allocator(alloc)
 			{
-				for (size_type i = 0; i < n; ++i)
-				{
-					*(_m_start + i) = val;
-				}
+				insert(begin(), n, val);
 				//Constructs a container with n elements. Each element is a copy of val.
 			}
 				//thanks https://stackoverflow.com/questions/11898657/enable-if-iterator-as-a-default-template-parameter
@@ -408,8 +403,7 @@ namespace ft
 						_m_end_of_storage(),
 						_allocator(alloc)
 			{
-				(void)first;
-				(void)last;
+				assign(first, last);
 				//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
 			}
 				vector(const vector& x) :
@@ -427,8 +421,8 @@ namespace ft
 					if (_m_start)
 					{
 						for (pointer i = _m_start; i < _m_finish; ++i)
-							allocator_type().destroy(i);
-						allocator_type().deallocate(_m_start, _m_end_of_storage - _m_start);
+							_allocator.destroy(i);
+						_allocator.deallocate(_m_start, _m_end_of_storage - _m_start);
 					}
 				}
 				//operator=
@@ -456,19 +450,19 @@ namespace ft
 				}
 				reverse_iterator rbegin()
 				{
-					return (reverse_iterator(iterator(_m_start)));
+					return (reverse_iterator(end()));
 				}
 				const_reverse_iterator rbegin() const
 				{
-					return (const_reverse_iterator(const_iterator(_m_start)));
+					return (const_reverse_iterator(end()));
 				}
 				reverse_iterator rend()
 				{
-					return (reverse_iterator(iterator(_m_finish)));
+					return (reverse_iterator(begin()));
 				}
 				const_reverse_iterator rend() const
 				{
-					return (const_reverse_iterator(const_iterator(_m_finish)));
+					return (const_reverse_iterator(begin()));
 				}
 				//capacity
 				size_type size() const
@@ -477,7 +471,7 @@ namespace ft
 				}
 				size_type max_size() const
 				{
-					return (size_type(allocator_type().max_size()));
+					return (size_type(_allocator.max_size()));
 				}
 				void	resize(size_type n, value_type val = value_type())
 				{
@@ -504,21 +498,21 @@ namespace ft
 					if (n > capacity())
 					{
 						const size_type	old_size = size();
-						pointer			new_vector = allocator_type().allocate(n * sizeof(value_type), 0);
+						pointer			new_vector = _allocator.allocate(n);
 						pointer			foo = _m_start;
 						pointer			bar = new_vector;
 
 						while (foo != _m_finish)
 						{
 							*bar = *foo;
-							allocator_type().destroy(foo);
+							_allocator.destroy(foo);
 							++foo;
 							++bar;
 						}
-						allocator_type().deallocate(_m_start, _m_end_of_storage - _m_start);
+						_allocator.deallocate(_m_start, _m_end_of_storage - _m_start);
 						_m_start = new_vector;
 						_m_finish = new_vector + old_size;
-						_m_end_of_storage = _m_start + n;
+						_m_end_of_storage = new_vector + n;
 					}
 				}
 				//element access
@@ -581,7 +575,7 @@ namespace ft
 				}
 				void		pop_back()
 				{
-					allocator_type().destroy(_m_finish - 1);
+					_allocator.destroy(_m_finish - 1);
 					--_m_finish;
 				}
 				iterator	insert(iterator position, const value_type& val)
@@ -605,20 +599,21 @@ namespace ft
 				}
 				void		insert(iterator position, size_type n, const value_type& val)
 				{
-					const difference_type	diff = position - iterator(_m_start);
+					const difference_type	diff = position - begin();
 
 					if (size() + n > capacity())
 						reserve(size() + n);
-					for (pointer i = _m_finish + n - 1, j = _m_finish - 1; i >= _m_start ; --i)
+					for (iterator it_dst = end() + n - 1, it_src = end() - 1; it_dst >= begin(); --it_dst)
 					{
-						if (i >= _m_start + diff + n || i < _m_start + diff)
+						if (it_dst >= begin() + diff + n || it_dst < begin() + diff)
 						{
-							*i = *j;
-							--j;
+							_allocator.construct(&(*it_dst), *it_src);
+							_allocator.destroy(&(*it_src));
+							--it_src;
 						}
 						else
 						{
-							*i = val;
+							_allocator.construct(&(*it_dst), val);
 						}
 					}
 					_m_finish += n;
@@ -635,7 +630,7 @@ namespace ft
 						}
 						else if (first != last)
 						{
-							vector tmp(first, last, allocator_type());
+							vector tmp(first, last, _allocator);
 							insert(pos, iterator(tmp.begin()), iterator(tmp.end()));
 						}
 					}
@@ -652,17 +647,18 @@ namespace ft
 				  }*/
 				iterator	erase(iterator position)
 				{
-					const difference_type	diff = position - iterator(_m_start);
+					const difference_type	diff = position - begin();
 					pointer	p = _m_start + diff;
 
-					allocator_type().destroy(p);
+					_allocator.destroy(p);
 					while (p != _m_finish - 1)
 					{
-						*p = *(p + 1);
+						_allocator.construct(p, *(p + 1));
+						_allocator.destroy(p + 1);
 						++p;
 					}
 					--_m_finish;
-					return (iterator(_m_start + diff));
+					return (begin() + diff);
 				}
 				iterator	erase(iterator first, iterator last)
 				{
@@ -672,8 +668,8 @@ namespace ft
 
 					for (difference_type i = 0; i < n; ++i)
 					{
-						allocator_type().destroy(p + i);
-						*(p + i) = *(p + i + n);
+						_allocator.destroy(p + i);
+						_allocator.construct(p + i, *(p + i + diff));
 					}
 					_m_finish -= n;
 					return (iterator(_m_start + diff));
@@ -697,7 +693,7 @@ namespace ft
 				void	clear()
 				{
 					for (pointer i = _m_start; i < _m_finish; ++i)
-						allocator_type().destroy(i);
+						_allocator.destroy(i);
 					_m_finish = _m_start;
 				}
 				//allocator
