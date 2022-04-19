@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/18 15:18:43 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/19 11:20:21 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -631,7 +631,7 @@ namespace ft
 						else if (first != last)
 						{
 							vector tmp(first, last, _allocator);
-							insert(pos, iterator(tmp.begin()), iterator(tmp.end()));
+							insert(pos, tmp.begin(), tmp.end());
 						}
 					}
 				/*template<typename _Integer>
@@ -662,17 +662,16 @@ namespace ft
 				}
 				iterator	erase(iterator first, iterator last)
 				{
-					const difference_type	n = last - first;
-					const difference_type	diff = first - iterator(_m_start);
-					pointer	p = _m_start + diff;
+					const iterator			ret = first;
+					const difference_type	diff = last - first;
 
-					for (difference_type i = 0; i < n; ++i)
+					for (; first < end() - diff; ++first)
 					{
-						_allocator.destroy(p + i);
-						_allocator.construct(p + i, *(p + i + diff));
+						_allocator.construct(&(first[0]), first[diff]);
+						_allocator.destroy(&(first[diff]));
 					}
-					_m_finish -= n;
-					return (iterator(_m_start + diff));
+					_m_finish -= diff;
+					return (ret);
 				}
 				void	swap(vector& x)
 				{
