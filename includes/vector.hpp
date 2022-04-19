@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/19 11:20:21 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/19 12:24:00 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -630,21 +630,10 @@ namespace ft
 						}
 						else if (first != last)
 						{
-							vector tmp(first, last, _allocator);
-							insert(pos, tmp.begin(), tmp.end());
+							for (difference_type i = pos - begin(); first != last; ++first, ++i)
+								insert(begin() + i, *first);
 						}
 					}
-				/*template<typename _Integer>
-				  void
-				  _M_insert_dispatch(iterator __pos, _Integer __n, _Integer __val,
-				  std::__true_type)
-				  { _M_fill_insert(__pos, __n, __val); }
-				  template<typename InputIterator>
-				  void	insert(iterator pos, InputIterator first, InputIterator last)
-				  {
-				  typedef typename std::__is_integer<_InputIterator>::__type _Integral;
-				  _M_insert_dispatch(__position, __first, __last, _Integral());
-				  }*/
 				iterator	erase(iterator position)
 				{
 					const difference_type	diff = position - begin();
