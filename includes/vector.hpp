@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/19 12:24:00 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/20 15:15:19 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -509,7 +509,10 @@ namespace ft
 							++foo;
 							++bar;
 						}
-						_allocator.deallocate(_m_start, _m_end_of_storage - _m_start);
+						for (pointer i = _m_start; i != _m_finish; ++i)
+							_allocator.destroy(i);
+						if (_m_start != _m_end_of_storage)
+							_allocator.deallocate(_m_start, _m_end_of_storage - _m_start);
 						_m_start = new_vector;
 						_m_finish = new_vector + old_size;
 						_m_end_of_storage = new_vector + n;
@@ -569,7 +572,7 @@ namespace ft
 				void		push_back(const value_type& val)
 				{
 					if (size() + 1 > capacity())
-						reserve(size() + 1);
+						reserve(capacity() == 0 ? 1 : capacity() * 2);
 					*_m_finish = val;
 					++_m_finish;
 				}
@@ -580,22 +583,10 @@ namespace ft
 				}
 				iterator	insert(iterator position, const value_type& val)
 				{
-					const difference_type	diff = position - iterator(_m_start);
+					const difference_type	diff = position - begin();
 
-					if (size() + 1 > capacity())
-						reserve(size() + 1);
-					pointer	new_position = _m_start + diff;
-					value_type	tmp_next = val;
-
-					for (pointer i = new_position; i <= _m_finish; ++i)
-					{
-						value_type	tmp_curent = tmp_next;
-
-						tmp_next = *i;
-						*i = tmp_curent;
-					}
-					++_m_finish;
-					return (iterator(new_position));
+					insert(position, 1, val);
+					return (begin() + diff);
 				}
 				void		insert(iterator position, size_type n, const value_type& val)
 				{
