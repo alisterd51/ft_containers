@@ -504,7 +504,7 @@ namespace ft
 
 						while (foo != _m_finish)
 						{
-							*bar = *foo;
+							_allocator.construct(bar, *foo);
 							_allocator.destroy(foo);
 							++foo;
 							++bar;
@@ -573,7 +573,7 @@ namespace ft
 				{
 					if (size() + 1 > capacity())
 						reserve(capacity() == 0 ? 1 : capacity() * 2);
-					*_m_finish = val;
+					_allocator.construct(_m_finish, val);
 					++_m_finish;
 				}
 				void		pop_back()
