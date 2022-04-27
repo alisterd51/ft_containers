@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/20 15:15:19 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/27 03:35:30 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -594,19 +594,13 @@ namespace ft
 
 					if (size() + n > capacity())
 						reserve(size() + n);
-					for (iterator it_dst = end() + n - 1, it_src = end() - 1; it_dst >= begin(); --it_dst)
+					for (difference_type i = size() - 1; i >= diff; i--)
 					{
-						if (it_dst >= begin() + diff + n || it_dst < begin() + diff)
-						{
-							_allocator.construct(&(*it_dst), *it_src);
-							_allocator.destroy(&(*it_src));
-							--it_src;
-						}
-						else
-						{
-							_allocator.construct(&(*it_dst), val);
-						}
+						_allocator.construct(&_m_start[i + n], _m_start[i]);
+						_allocator.destroy(&_m_start[i]);
 					}
+					for (size_type i = diff; i < diff + n; i++)
+						_allocator.construct(&_m_start[i], val);
 					_m_finish += n;
 				}
 				template<typename InputIterator>
