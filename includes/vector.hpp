@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/30 23:01:59 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/01 01:12:02 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -599,7 +599,6 @@ namespace ft
 						while (foo != _m_finish)
 						{
 							_allocator.construct(bar, *foo);
-							//_allocator.destroy(foo);
 							++foo;
 							++bar;
 						}
@@ -655,6 +654,14 @@ namespace ft
 							typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = NULL,
 							typename std::iterator_traits<InputIterator>::iterator_category* = NULL)
 					{
+						if (capacity() == 0)
+						{
+							size_type	new_size = 0;
+
+							for (InputIterator test = first; test != last; ++test, ++new_size)
+								;
+							reserve(new_size);
+						}
 						erase(begin(), end());
 						insert(begin(), first, last);
 					}
@@ -686,8 +693,15 @@ namespace ft
 				{
 					const difference_type	diff = position - begin();
 
+					if (n == 0)
+						return ;
 					if (size() + n > capacity())
-						reserve(size() + n);
+					{
+						if (size() > n)
+							reserve(size() * 2);
+						else
+							reserve(size() + n);
+					}
 					for (difference_type i = size() - 1; i >= diff; i--)
 					{
 						_allocator.construct(&_m_start[i + n], _m_start[i]);
