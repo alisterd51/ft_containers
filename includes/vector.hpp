@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/30 20:21:42 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/04/30 23:01:59 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -523,7 +523,8 @@ namespace ft
 				//operator=
 				vector&	operator=(const vector& x)
 				{
-					assign(x.begin(), x.end());
+					if (this != &x)
+						assign(x.begin(), x.end());
 					return (*this);
 				}
 				//iterators
@@ -785,10 +786,15 @@ namespace ft
 					const iterator			ret = first;
 					const difference_type	diff = last - first;
 
-					for (; first < end() - diff; ++first)
+					for (; first < end(); ++first, ++last)
 					{
-						_allocator.construct(&(first[0]), first[diff]);
-						_allocator.destroy(&(first[diff]));
+						if (last < end())
+						{
+							_allocator.destroy(&(first[0]));
+							_allocator.construct(&(first[0]), last[0]);
+						}
+						else
+							_allocator.destroy(&(first[0]));
 					}
 					_m_finish -= diff;
 					return (ret);
