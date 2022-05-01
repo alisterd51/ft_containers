@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 12:59:24 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/01 14:09:26 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ namespace ft
 				typedef typename allocator_type::const_pointer					const_pointer;
 				typedef __ft::__normal_iterator<pointer, vector>				iterator;
 				typedef __ft::__normal_iterator<const_pointer, vector>			const_iterator;
-				typedef std::reverse_iterator<iterator>							reverse_iterator;
-				typedef std::reverse_iterator<const_iterator>					const_reverse_iterator;
+				typedef ft::reverse_iterator<iterator>							reverse_iterator;
+				typedef ft::reverse_iterator<const_iterator>					const_reverse_iterator;
 				typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
 				typedef std::size_t												size_type;
 				//constructor
@@ -281,59 +281,6 @@ namespace ft
 					for (size_type i = diff; i < diff + n; i++)
 						_allocator.construct(&_m_start[i], val);
 					_m_finish += n;
-					/*if (n == 0)
-					  return ;
-					  if (n > this->max_size())
-					  throw (std::length_error("vector::insert (fill)"));
-					  size_type pos_len = position - this->begin();
-					  if (size_type(_m_end_of_storage - _m_finish) >= n)
-					  {
-					  for (size_type i = 0; i < this->size() - pos_len; i++)
-					  _allocator.construct(_m_finish - i + (n - 1), *(_m_finish - i - 1));
-					  _m_finish += n;
-					  while (n)
-					  {
-					  _allocator.construct(&(*position) + (n - 1), val);
-					  n--;
-					  }
-					  }
-					  else
-					  {
-					  pointer new_start = pointer();
-					  pointer new_end = pointer();
-					  pointer new_end_capacity = pointer();
-
-					  int next_capacity = (this->capacity() > 0) ? (int)(this->size() * 2) : 1;
-					  new_start = _allocator.allocate(next_capacity);
-					  new_end_capacity = new_start + next_capacity;
-
-					  if (size_type(new_end_capacity - new_start) < this->size() + n)
-					  {
-					  if (new_start)
-					  _allocator.deallocate(new_start, new_start - new_end_capacity);
-					  next_capacity = this->size() + n;
-					  new_start = _allocator.allocate(next_capacity);
-					  new_end = new_start + this->size() + n;
-					  new_end_capacity = new_start + next_capacity;
-					  }
-
-					  new_end = new_start + this->size() + n;
-
-					  for (int i = 0; i < (position - begin()); i++)
-					  _allocator.construct(new_start + i, *(_m_start + i));
-					  for (size_type k = 0; k < n; k++)
-					  _allocator.construct(new_start + pos_len + k, val);
-					  for (size_type j = 0; j < (this->size() - pos_len); j++)
-					  _allocator.construct(new_end - j - 1, *(_m_finish - j - 1));
-
-					  for (size_type u = 0; u < this->size(); u++)
-					  _allocator.destroy(_m_start + u);
-					  _allocator.deallocate(_m_start, this->capacity());
-
-					  _m_start = new_start;
-					  _m_finish = new_end;
-					  _m_end_of_storage = new_end_capacity;
-					  }*/
 				}
 				template<typename InputIterator>
 					void	insert(iterator pos, InputIterator first, InputIterator last,

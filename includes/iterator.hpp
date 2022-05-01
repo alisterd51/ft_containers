@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 13:10:16 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/01 14:23:26 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,45 @@ namespace ft
 		{
 			return (rhs.base() - lhs.base());
 		}
+	template<typename _IteratorL, typename _IteratorR>
+    bool
+    operator==(const reverse_iterator<_IteratorL>& __x,
+           const reverse_iterator<_IteratorR>& __y)
+    { return __x.base() == __y.base(); }
+
+  template<typename _IteratorL, typename _IteratorR>
+    bool
+    operator<(const reverse_iterator<_IteratorL>& __x,
+          const reverse_iterator<_IteratorR>& __y)
+    { return __y.base() < __x.base(); }
+
+  template<typename _IteratorL, typename _IteratorR>
+    bool
+    operator!=(const reverse_iterator<_IteratorL>& __x,
+           const reverse_iterator<_IteratorR>& __y)
+    { return !(__x == __y); }
+
+  template<typename _IteratorL, typename _IteratorR>
+    bool
+    operator>(const reverse_iterator<_IteratorL>& __x,
+          const reverse_iterator<_IteratorR>& __y)
+    { return __y < __x; }
+
+  template<typename _IteratorL, typename _IteratorR>
+    bool
+    operator<=(const reverse_iterator<_IteratorL>& __x,
+           const reverse_iterator<_IteratorR>& __y)
+    { return !(__y < __x); }
+  template<typename _IteratorL, typename _IteratorR>
+    bool
+    operator>=(const reverse_iterator<_IteratorL>& __x,
+           const reverse_iterator<_IteratorR>& __y)
+    { return !(__x < __y); }
+  template<typename _IteratorL, typename _IteratorR>
+    typename reverse_iterator<_IteratorL>::difference_type
+    operator-(const reverse_iterator<_IteratorL>& __x,
+          const reverse_iterator<_IteratorR>& __y)
+    { return __y.base() - __x.base(); }
 }
 
 namespace __ft
