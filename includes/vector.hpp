@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 16:19:29 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/01 18:13:44 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@
 #include <limits>
 #include "iterator.hpp"
 #include "algorithm.hpp"
-
-#include <vector>
 
 namespace ft
 {
@@ -70,8 +68,7 @@ namespace ft
 						_m_end_of_storage(),
 						_allocator(alloc)
 			{
-				typedef typename std::__is_integer<InputIterator>::__type _Integral;
-				_M_assign_dispatch(first, last, _Integral());
+				_M_assign_dispatch(first, last, is_integral<InputIterator>());
 				//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
 			}
 				vector(const vector& x) :
@@ -225,8 +222,7 @@ namespace ft
 				template <class InputIterator>
 					void	assign(InputIterator first, InputIterator last)
 					{
-						typedef typename std::__is_integer<InputIterator>::__type _Integral;
-						_M_assign_dispatch(first, last, _Integral());
+						_M_assign_dispatch(first, last, is_integral<InputIterator>());
 					}
 				void		assign(size_type n, const value_type& val)
 				{
@@ -258,8 +254,7 @@ namespace ft
 				template<typename InputIterator>
 					void	insert(iterator pos, InputIterator first, InputIterator last)
 					{
-						typedef typename std::__is_integer<InputIterator>::__type _Integral;
-						_M_insert_dispatch(pos, first, last, _Integral());
+						_M_insert_dispatch(pos, first, last, is_integral<InputIterator>());
 					}
 				iterator	erase(iterator position)
 				{
@@ -346,12 +341,12 @@ namespace ft
 					}
 				template<typename _Integer>
 					void
-					_M_assign_dispatch(_Integer __n, _Integer __val, std::__true_type)
+					_M_assign_dispatch(_Integer __n, _Integer __val, true_type)
 					{ _M_fill_assign(__n, __val); }
 				template<typename _InputIterator>
 					void
 					_M_assign_dispatch(_InputIterator __first, _InputIterator __last,
-							std::__false_type)
+							false_type)
 					{ _M_assign_aux(__first, __last, std::__iterator_category(__first)); }
 				void		_M_fill_assign(size_type n, const value_type& val)
 				{
@@ -400,7 +395,7 @@ namespace ft
 				template<typename _InputIterator>
 					void
 					_M_insert_dispatch(iterator __pos, _InputIterator __first,
-							_InputIterator __last, std::__false_type)
+							_InputIterator __last, false_type)
 					{
 						_M_range_insert(__pos, __first, __last,
 								std::__iterator_category(__first));
@@ -408,7 +403,7 @@ namespace ft
 				template<typename _Integer>
 					void
 					_M_insert_dispatch(iterator __pos, _Integer __n, _Integer __val,
-							std::__true_type)
+							true_type)
 					{
 						_M_fill_insert(__pos, __n, __val);
 					}
