@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 15:47:46 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/01 16:02:13 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,15 +61,15 @@ namespace ft
 				//and
 				//https://stackoverflow.com/questions/15598939/how-do-i-use-stdis-integral-to-select-an-implementation
 				template <class InputIterator>
-					vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
-							typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = NULL,
-							typename std::iterator_traits<InputIterator>::iterator_category* = NULL) :
+					vector(InputIterator first, InputIterator last,
+							const allocator_type& alloc = allocator_type()) :
 						_m_start(),
 						_m_finish(),
 						_m_end_of_storage(),
 						_allocator(alloc)
 			{
-				assign(first, last);
+				typedef typename std::__is_integer<InputIterator>::__type _Integral;
+				_M_assign_dispatch(first, last, _Integral());
 				//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
 			}
 				vector(const vector& x) :
