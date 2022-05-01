@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 18:30:38 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/02 01:36:53 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -289,7 +289,7 @@ namespace __ft
 				template<typename _Iter>
 					__normal_iterator(const __normal_iterator<_Iter,
 							typename ft::enable_if<
-							(std::__are_same<_Iter, typename _Container::pointer>::__value),
+							(ft::is_same<_Iter, typename _Container::pointer>::value),
 							_Container>::type>& __i)
 					: _M_current(__i.base())
 					{

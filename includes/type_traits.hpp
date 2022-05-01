@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/04 23:51:36 by anclarma          #+#    #+#             */
-/*   Updated: 2022/04/05 03:09:38 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/02 01:38:50 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,17 @@ namespace	ft
 		struct	enable_if<true, T>
 		{
 			typedef T	type;
+		};
+	//is_same
+	template <class T, class U>
+		struct is_same
+		: public false_type
+		{
+		};
+	template<typename _Tp>
+		struct is_same<_Tp, _Tp>
+		: public true_type
+		{
 		};
 }
 
