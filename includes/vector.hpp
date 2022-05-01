@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 16:02:13 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/01 16:19:29 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <limits>
 #include "iterator.hpp"
 #include "algorithm.hpp"
+
+#include <vector>
 
 namespace ft
 {
