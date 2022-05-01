@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 14:09:26 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/01 15:47:46 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,25 +221,14 @@ namespace ft
 				}
 				//modifiers
 				template <class InputIterator>
-					void	assign(InputIterator first, InputIterator last,
-							typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = NULL,
-							typename std::iterator_traits<InputIterator>::iterator_category* = NULL)
+					void	assign(InputIterator first, InputIterator last)
 					{
-						if (capacity() == 0)
-						{
-							size_type	new_size = 0;
-
-							for (InputIterator test = first; test != last; ++test, ++new_size)
-								;
-							reserve(new_size);
-						}
-						erase(begin(), end());
-						insert(begin(), first, last);
+						typedef typename std::__is_integer<InputIterator>::__type _Integral;
+						_M_assign_dispatch(first, last, _Integral());
 					}
 				void		assign(size_type n, const value_type& val)
 				{
-					erase(begin(), end());
-					insert(begin(), n, val);
+					_M_fill_assign(n, val);
 				}
 				void		push_back(const value_type& val)
 				{
@@ -262,41 +251,13 @@ namespace ft
 				}
 				void		insert(iterator position, size_type n, const value_type& val)
 				{
-					const difference_type	diff = position - begin();
-
-					if (n == 0)
-						return ;
-					if (size() + n > capacity())
-					{
-						if (size() > n)
-							reserve(size() * 2);
-						else
-							reserve(size() + n);
-					}
-					for (difference_type i = size() - 1; i >= diff; i--)
-					{
-						_allocator.construct(&_m_start[i + n], _m_start[i]);
-						_allocator.destroy(&_m_start[i]);
-					}
-					for (size_type i = diff; i < diff + n; i++)
-						_allocator.construct(&_m_start[i], val);
-					_m_finish += n;
+					_M_fill_insert(position, n, val);
 				}
 				template<typename InputIterator>
-					void	insert(iterator pos, InputIterator first, InputIterator last,
-							typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = NULL,
-							typename std::iterator_traits<InputIterator>::iterator_category* = NULL)
+					void	insert(iterator pos, InputIterator first, InputIterator last)
 					{
-						if (pos == end())
-						{
-							for (; first != last; ++first)
-								insert(end(), *first);
-						}
-						else if (first != last)
-						{
-							for (difference_type i = pos - begin(); first != last; ++first, ++i)
-								insert(begin() + i, *first);
-						}
+						typedef typename std::__is_integer<InputIterator>::__type _Integral;
+						_M_insert_dispatch(pos, first, last, _Integral());
 					}
 				iterator	erase(iterator position)
 				{
@@ -363,6 +324,92 @@ namespace ft
 				pointer	_m_finish;
 				pointer	_m_end_of_storage;
 				Alloc	_allocator;
+
+				//sub assign function
+				template<typename InputIterator>
+					void
+					_M_assign_aux(InputIterator first, InputIterator last,
+							std::input_iterator_tag)
+					{
+						if (capacity() == 0)
+						{
+							size_type	new_size = 0;
+
+							for (InputIterator test = first; test != last; ++test, ++new_size)
+								;
+							reserve(new_size);
+						}
+						erase(begin(), end());
+						insert(begin(), first, last);
+					}
+				template<typename _Integer>
+					void
+					_M_assign_dispatch(_Integer __n, _Integer __val, std::__true_type)
+					{ _M_fill_assign(__n, __val); }
+				template<typename _InputIterator>
+					void
+					_M_assign_dispatch(_InputIterator __first, _InputIterator __last,
+							std::__false_type)
+					{ _M_assign_aux(__first, __last, std::__iterator_category(__first)); }
+				void		_M_fill_assign(size_type n, const value_type& val)
+				{
+					erase(begin(), end());
+					insert(begin(), n, val);
+				}
+				//sub insert function
+				void		_M_fill_insert(iterator position, size_type n, const value_type& val)
+				{
+					const difference_type	diff = position - begin();
+
+					if (n == 0)
+						return ;
+					if (size() + n > capacity())
+					{
+						if (size() > n)
+							reserve(size() * 2);
+						else
+							reserve(size() + n);
+					}
+					for (difference_type i = size() - 1; i >= diff; i--)
+					{
+						_allocator.construct(&_m_start[i + n], _m_start[i]);
+						_allocator.destroy(&_m_start[i]);
+					}
+					for (size_type i = diff; i < diff + n; i++)
+						_allocator.construct(&_m_start[i], val);
+					_m_finish += n;
+				}
+				template<typename _InputIterator>
+					void
+					_M_range_insert(iterator pos, _InputIterator first,
+							_InputIterator last, std::input_iterator_tag)
+					{
+						if (pos == end())
+						{
+							for (; first != last; ++first)
+								insert(end(), *first);
+						}
+						else if (first != last)
+						{
+							for (difference_type i = pos - begin(); first != last; ++first, ++i)
+								insert(begin() + i, *first);
+						}
+					}
+				template<typename _InputIterator>
+					void
+					_M_insert_dispatch(iterator __pos, _InputIterator __first,
+							_InputIterator __last, std::__false_type)
+					{
+						_M_range_insert(__pos, __first, __last,
+								std::__iterator_category(__first));
+					}
+				template<typename _Integer>
+					void
+					_M_insert_dispatch(iterator __pos, _Integer __n, _Integer __val,
+							std::__true_type)
+					{
+						_M_fill_insert(__pos, __n, __val);
+					}
 		};
 	//non member function overloads
 	template <class T, class Alloc>
