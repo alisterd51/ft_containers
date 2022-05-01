@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 18:13:44 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/02 01:49:47 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -347,7 +347,7 @@ namespace ft
 					void
 					_M_assign_dispatch(_InputIterator __first, _InputIterator __last,
 							false_type)
-					{ _M_assign_aux(__first, __last, std::__iterator_category(__first)); }
+					{ _M_assign_aux(__first, __last, typename ft::iterator_traits<_InputIterator>::iterator_category()); }
 				void		_M_fill_assign(size_type n, const value_type& val)
 				{
 					erase(begin(), end());
@@ -398,7 +398,7 @@ namespace ft
 							_InputIterator __last, false_type)
 					{
 						_M_range_insert(__pos, __first, __last,
-								std::__iterator_category(__first));
+								typename ft::iterator_traits<_InputIterator>::iterator_category());
 					}
 				template<typename _Integer>
 					void
