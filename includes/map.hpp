@@ -6,19 +6,210 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/01 19:42:44 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/02 00:25:46 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MAP_HPP
 # define MAP_HPP
 
+# define _FT_RB_TREE_BLACK	0
+# define _FT_RB_TREE_RED	1
+# define _FT_RB_TREE_LEAF	NULL
+
 namespace ft
 {
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
-    class _Rb_tree
-	{
-	};
+		class _Rb_tree
+		{
+			private:
+				typedef struct s_node_rb_tree	node_rb_tree;
+				struct	s_node_rb_tree
+				{
+					private:
+						node_rb_tree	*_left;
+						node_rb_tree	*_right;
+						node_rb_tree	*_parent;
+						int				_color;
+						_Key			_key;
+						_Val			_value;
+					public:
+						_Key			get_key()
+						{
+							return (this->_key);
+						}
+						_Val			get_value()
+						{
+							return (this->_value);
+						}
+						int				color()
+						{
+							return (this->_color);
+						}
+						node_rb_tree    *left()
+						{
+							return (this->_left)
+						}
+						node_rb_tree    *right()
+						{
+							return (this->_right)
+						}
+						node_rb_tree    *parent()
+						{
+							return (this->_parent)
+						}
+						node_rb_tree	*grandparent()
+						{
+							if (this->parent() == NULL)
+								return (NULL);
+							return (this->parent()->parent());
+						}
+						node_rb_tree	*brother()
+						{
+							if (this->parent() == NULL)
+								return (NULL);
+							if (this == this->parent()->left())
+								return (this->parent()->right());
+							else
+								return (this->parent()->left());
+						}
+						node_rb_tree	*uncle()
+						{
+							if (this->grandparent() == NULL)
+								return (NULL);
+							return (this->parent()->brother());
+						}
+				};
+				//rotation
+				void	left_rotation(node_rb_tree *x)
+				{
+					node_rb_tree	*y = x->right();
+
+					x->right() = y->left();
+					if (y->left != _FT_RB_TREE_LEAF)
+						y->right()->parent() = x;
+					y->parent() = x->parent();
+					if (c->parent() == NULL)
+						x = y;
+					else if (x ==  x->parent()->left())
+						x->parent()->left() = y;
+					else
+						 x->parent()->right() = y;
+					y->left() = x;
+					x->parent() = y;
+				}
+				void	right_rotation(node_rb_tree *x)
+				{
+					node_rb_tree	*y = x->left();
+
+					x->left() = y->right();
+					if (y->right != _FT_RB_TREE_LEAF)
+						y->left()->parent() = x;
+					y->parent() = x->parent();
+					if (c->parent() == NULL)
+						x = y;
+					else if (x ==  x->parent()->right())
+						x->parent()->right() = y;
+					else
+						 x->parent()->left() = y;
+					y->right() = x;
+					x->parent() = y;
+				}
+				//search
+				//insertion
+				node_rb_tree *insertion(node_rb_tree *root, node_rb_tree *n)
+				{
+					// Insertion d'un nouveau nœud dans l'arbre
+					insertion_recursif(root, n);
+					// Réparation de l'arbre au cas où les propriétés rouge-noir seraient violées
+					insertion_repare_arbre(n);
+					// Recherche de la nouvelle racine à renvoyer
+					root = n;
+					while (root->parent() != NULL)
+						root = root->parent();
+					return (root);
+				}
+				void recursive_insertion(node_rb_tree *root, node_rb_tree *n)
+				{
+					// Descente récursive dans l'arbre jusqu'à atteindre une feuille
+					if (root != NULL && n->get_key() < root->get_key()) {
+						if (root->left() != FEUILLE)
+						{
+							recursive_insertion(root->left(), n);
+							return ;
+						}
+						else
+							root->left() = n;
+					}
+					else if (root != NULL) {
+						if (root->right() != _FT_RB_TREE_LEAF)
+						{
+							recursive_insertion(root->right(), n);
+							return;
+						}
+						else
+							root->right() = n;
+					}
+
+					// Insertion du nouveau noeud n
+					n->parent() = root;
+					n->left() = _FT_RB_TREE_LEAF; // NIL
+					n->right() = _FT_RB_TREE_LEAF; // NIL
+					n->color() = _FT_RB_TREE_RED;
+				}
+				//balancing
+				void	balancing(node_rb_tree *n)
+				{
+					if (n->parent() == NULL)
+						balancing_cas1(n);
+					else if (n->parent()->color() == _FT_RB_TREE_BLACK)
+						balancing_cas2(n);
+					else if (n->uncle()->color() == _FT_RB_TREE_RED)
+						balancing_cas3(n);
+					else
+						balancing_cas4(n);
+				}
+				void	balancing_cas1(node_rb_tree *n)
+				{
+					if (n->parent() == NULL)
+						n->color() = _FT_RB_TREE_BLACK;
+				}
+				void	balancing_cas2(node_rb_tree *n)
+				{
+					return ;
+				}
+				void	balancing_cas3(node_rb_tree *n)
+				{
+					n->parent()->color() = _FT_RB_TREE_BLACK;
+					n->uncle()->color() = _FT_RB_TREE_BLACK;
+					n->grandparent()->color() = _FT_RB_TREE_RED;
+					balancing(n->grandparent());
+				}
+				void	balancing_cas4(node_rb_tree *n)
+				{
+					if (n == n->grandparent()->left()->right())
+					{
+						left_rotation(n->parent());
+						n = n->left();
+					}
+					else if (n == n->grandparent()->right()->left())
+					{
+						right_rotation(n->parent());
+						n = n->right();
+					}
+					balancing_cas5(n);
+				}
+				void	balancing_cas5(node_rb_tree *n)
+				{
+					if (n == n->parent()->left())
+						right_rotation(n->grandparent());
+					else
+						left_rotation(n->grandparent());
+					n->parent()->color() = _FT_RB_TREE_BLACK;
+					n->grandparent()->color() = _FT_RB_TREE_RED;
+				}
+			public:
+		};
 }
 
 namespace ft
