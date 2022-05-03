@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:21:42 by antoine           #+#    #+#             */
-/*   Updated: 2022/04/17 14:41:59 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/02 23:30:49 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@ namespace ft
 				Container c;
 			public:
 				//constructor
+				//Copy-constructs the underlying container c with the contents of cont.
+				//Complexity:
+				// Same as the corresponding operation on the wrapped container
 				explicit stack(const Container& cont = Container()) :
 					c(cont)
 				{
@@ -37,28 +40,40 @@ namespace ft
 				//destructor
 				//operator=
 				//capacity
+				//Complexity:
+				// Constant
 				bool empty() const
 				{
 					return (c.empty());
 				}
+				//Complexity:
+				// Constant
 				size_type size() const
 				{
 					return (c.size());
 				}
 				//element access
+				//Complexity:
+				// Constant
 				value_type& top()
 				{
 					return (c.back());
 				}
+				//Complexity:
+				// Constant
 				const value_type& top() const
 				{
 					return (c.back());
 				}
 				//modifiers
+				//Complexity:
+				// Equal to the complexity of Container::push_back
 				void push(const value_type& x)
 				{
 					c.push_back(x);
 				}
+				//Complexity:
+				// Equal to the complexity of Container::pop_back
 				void pop()
 				{
 					c.pop_back();
@@ -70,6 +85,8 @@ namespace ft
 				}
 		};
 	//non-member functions
+	//Complexity:
+	// Linear in the size of the container
 	template <class T, class Container>
 		bool operator==(const stack<T, Container>& x,
 				const stack<T, Container>& y)

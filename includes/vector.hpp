@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:38:28 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/02 01:49:47 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/03 02:34:56 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,59 +38,69 @@ namespace ft
 				typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
 				typedef std::size_t												size_type;
 				//constructor
+				//Constructs an empty container, with no elements.
+				//Complexity:
+				// Constant
 				explicit vector(const allocator_type& alloc = allocator_type()) :
-					_m_start(),
-					_m_finish(),
-					_m_end_of_storage(),
+					_start(),
+					_finish(),
+					_end_of_storage(),
 					_allocator(alloc)
 			{
-				//Constructs an empty container, with no elements.
 			}
+				//Constructs a container with n elements. Each element is a copy of val.
+				//Complexity:
+				// Linear in n
 				explicit vector(size_type n,
 						const value_type& val = value_type(),
 						const allocator_type& alloc = allocator_type()) :
-					_m_start(),
-					_m_finish(),
-					_m_end_of_storage(),
+					_start(),
+					_finish(),
+					_end_of_storage(),
 					_allocator(alloc)
 			{
 				insert(begin(), n, val);
-				//Constructs a container with n elements. Each element is a copy of val.
 			}
-				//thanks https://stackoverflow.com/questions/11898657/enable-if-iterator-as-a-default-template-parameter
-				//and
-				//https://stackoverflow.com/questions/15598939/how-do-i-use-stdis-integral-to-select-an-implementation
+				//Constructs a container with as many elements as the range [first,last),
+				//with each element constructed from its corresponding element in that range, in the same order.
+				//Complexity:
+				// Linear in distance between first and last
 				template <class InputIterator>
 					vector(InputIterator first, InputIterator last,
 							const allocator_type& alloc = allocator_type()) :
-						_m_start(),
-						_m_finish(),
-						_m_end_of_storage(),
+						_start(),
+						_finish(),
+						_end_of_storage(),
 						_allocator(alloc)
 			{
-				_M_assign_dispatch(first, last, is_integral<InputIterator>());
-				//Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
+				_assign_dispatch(first, last, is_integral<InputIterator>());
 			}
+				//Constructs a container with a copy of each of the elements in x, in the same order.
+				//Complexity:
+				// Linear in size of x
 				vector(const vector& x) :
-					_m_start(),
-					_m_finish(),
-					_m_end_of_storage(),
+					_start(),
+					_finish(),
+					_end_of_storage(),
 					_allocator(Alloc())
 			{
 				*this = x;
-				//Constructs a container with a copy of each of the elements in x, in the same order.
 			}
 				//destructor
+				//Complexity:
+				// Linear in the size of the vector
 				~vector()
 				{
-					if (_m_start)
+					if (_start)
 					{
-						for (pointer i = _m_start; i < _m_finish; ++i)
+						for (pointer i = _start; i < _finish; ++i)
 							_allocator.destroy(i);
-						_allocator.deallocate(_m_start, _m_end_of_storage - _m_start);
+						_allocator.deallocate(_start, _end_of_storage - _start);
 					}
 				}
 				//operator=
+				//Complexity:
+				//  Linear in the size of *this and x.
 				vector&	operator=(const vector& x)
 				{
 					if (this != &x)
@@ -98,47 +108,70 @@ namespace ft
 					return (*this);
 				}
 				//iterators
+				//Complexity:
+				// Constant
 				iterator begin()
 				{
-					return (iterator(_m_start));
+					return (iterator(_start));
 				}
+				//Complexity:
+				// Constant
 				const_iterator begin() const
 				{
-					return (const_iterator(_m_start));
+					return (const_iterator(_start));
 				}
+				//Complexity:
+				// Constant
 				iterator end()
 				{
-					return (iterator(_m_finish));
+					return (iterator(_finish));
 				}
+				//Complexity:
+				// Constant
 				const_iterator end() const
 				{
-					return (const_iterator(_m_finish));
+					return (const_iterator(_finish));
 				}
+				//Complexity:
+				// Constant
 				reverse_iterator rbegin()
 				{
 					return (reverse_iterator(end()));
 				}
+				//Complexity:
+				// Constant
 				const_reverse_iterator rbegin() const
 				{
 					return (const_reverse_iterator(end()));
 				}
+				//Complexity:
+				// Constant
 				reverse_iterator rend()
 				{
 					return (reverse_iterator(begin()));
 				}
+				//Complexity:
+				// Constant
 				const_reverse_iterator rend() const
 				{
 					return (const_reverse_iterator(begin()));
 				}
 				//capacity
+				//Complexity:
+				// Constant
 				size_type size() const
 				{
-					return (size_type(_m_finish - _m_start));
+					return (size_type(_finish - _start));
 				}
+				//Complexity:
+				// Constant
 				size_type max_size() const
 				{
 					return (size_type(_allocator.max_size()));
 				}
+				//Complexity:
+				// Linear in the difference between the current size and n.
+				// Additional complexity possible due to reallocation if capacity is less than count
 				void	resize(size_type n, value_type val = value_type())
 				{
 					if (n > size())
@@ -147,14 +180,20 @@ namespace ft
 						erase(begin() + n, end());
 					return ;
 				}
+				//Complexity:
+				// Constant
 				size_type	capacity() const
 				{
-					return (size_type(_m_end_of_storage - _m_start));
+					return (size_type(_end_of_storage - _start));
 				}
+				//Complexity:
+				// Constant
 				bool	empty() const
 				{
 					return (begin() == end());
 				}
+				//Complexity:
+				// At most linear in the size() of the container.
 				void	reserve(size_type n)
 				{
 					if (n > max_size())
@@ -163,83 +202,108 @@ namespace ft
 					{
 						const size_type	old_size = size();
 						pointer			new_vector = _allocator.allocate(n);
-						pointer			foo = _m_start;
-						pointer			bar = new_vector;
 
-						while (foo != _m_finish)
-						{
+						for (pointer foo = _start, bar = new_vector;
+								foo != _finish; ++foo, ++bar)
 							_allocator.construct(bar, *foo);
-							++foo;
-							++bar;
-						}
-						for (pointer i = _m_start; i != _m_finish; ++i)
+						for (pointer i = _start; i != _finish; ++i)
 							_allocator.destroy(i);
-						if (_m_start != _m_end_of_storage)
-							_allocator.deallocate(_m_start, _m_end_of_storage - _m_start);
-						_m_start = new_vector;
-						_m_finish = new_vector + old_size;
-						_m_end_of_storage = new_vector + n;
+						if (_start != _end_of_storage)
+							_allocator.deallocate(_start, _end_of_storage - _start);
+						_start = new_vector;
+						_finish = new_vector + old_size;
+						_end_of_storage = new_vector + n;
 					}
 				}
 				//element access
+				//Complexity:
+				// Constant
 				reference		operator[](size_type n)
 				{
-					return (*(_m_start + n));
+					return (*(_start + n));
 				}
+				//Complexity:
+				// Constant
 				const_reference	operator[](size_type n) const
 				{
-					return (*(_m_start + n));
+					return (*(_start + n));
 				}
+				//Complexity:
+				// Constant
 				reference		at(size_type n)
 				{
 					if (n >= size())
 						throw std::out_of_range("vector::at");
-					return (*(_m_start + n));
+					return (*(_start + n));
 				}
+				//Complexity:
+				// Constant
 				const_reference	at(size_type n) const
 				{
 					if (n >= size())
 						throw std::out_of_range("vector::at");
-					return (*(_m_start + n));
+					return (*(_start + n));
 				}
+				//Complexity:
+				// Constant
 				reference		front()
 				{
-					return (*_m_start);
+					return (*_start);
 				}
+				//Complexity:
+				// Constant
 				const_reference	front() const
 				{
-					return (*_m_start);
+					return (*_start);
 				}
+				//Complexity:
+				// Constant
 				reference		back()
 				{
-					return (*(_m_finish - 1));
+					return (*(_finish - 1));
 				}
+				//Complexity:
+				// Constant
 				const_reference	back() const
 				{
-					return (*(_m_finish - 1));
+					return (*(_finish - 1));
 				}
 				//modifiers
+				//call either:
+				// _assign_aux if InputIterator is std::input_iterator_tag
+				// _fill_assign else
+				//Complexity:
+				// Linear in distance between first and last
 				template <class InputIterator>
 					void	assign(InputIterator first, InputIterator last)
 					{
-						_M_assign_dispatch(first, last, is_integral<InputIterator>());
+						_assign_dispatch(first, last, is_integral<InputIterator>());
 					}
+				//call _fill_assign
+				//Complexity:
+				// Linear in n
 				void		assign(size_type n, const value_type& val)
 				{
-					_M_fill_assign(n, val);
+					_fill_assign(n, val);
 				}
+				//Complexity:
+				// Amortized constant
 				void		push_back(const value_type& val)
 				{
 					if (size() + 1 > capacity())
 						reserve(capacity() == 0 ? 1 : capacity() * 2);
-					_allocator.construct(_m_finish, val);
-					++_m_finish;
+					_allocator.construct(_finish, val);
+					++_finish;
 				}
+				//Complexity:
+				// Constant
 				void		pop_back()
 				{
-					_allocator.destroy(_m_finish - 1);
-					--_m_finish;
+					_allocator.destroy(_finish - 1);
+					--_finish;
 				}
+				//Complexity:
+				// Constant plus linear in the distance between position and end of the container
 				iterator	insert(iterator position, const value_type& val)
 				{
 					const difference_type	diff = position - begin();
@@ -247,30 +311,48 @@ namespace ft
 					insert(position, 1, val);
 					return (begin() + diff);
 				}
+				//call _fill_insert
+				//Complexity:
+				// Linear in n plus linear in the distance between position and end of the container
 				void		insert(iterator position, size_type n, const value_type& val)
 				{
-					_M_fill_insert(position, n, val);
+					_fill_insert(position, n, val);
 				}
+				//call either:
+				// _range_insert if InputIterator is std::input_iterator_tag
+				// _insert_dispatch else
+				//Complexity:
+				// Linear in std::distance(first, last) plus linear in the distance between pos and end of the container
 				template<typename InputIterator>
 					void	insert(iterator pos, InputIterator first, InputIterator last)
 					{
-						_M_insert_dispatch(pos, first, last, is_integral<InputIterator>());
+						_insert_dispatch(pos, first, last, is_integral<InputIterator>());
 					}
+				//Complexity:
+				// Linear: the number of calls to the destructor of T is the
+				// same as the number of elements erased, the assignment
+				// operator of T is called the number of times equal to the
+				// number of elements in the vector after the erased elements
 				iterator	erase(iterator position)
 				{
 					const difference_type	diff = position - begin();
-					pointer	p = _m_start + diff;
+					pointer	p = _start + diff;
 
 					_allocator.destroy(p);
-					while (p != _m_finish - 1)
+					while (p != _finish - 1)
 					{
 						_allocator.construct(p, *(p + 1));
 						_allocator.destroy(p + 1);
 						++p;
 					}
-					--_m_finish;
+					--_finish;
 					return (begin() + diff);
 				}
+				//Complexity:
+				// Linear: the number of calls to the destructor of T is the
+				// same as the number of elements erased, the assignment
+				// operator of T is called the number of times equal to the
+				// number of elements in the vector after the erased elements
 				iterator	erase(iterator first, iterator last)
 				{
 					const iterator			ret = first;
@@ -286,43 +368,69 @@ namespace ft
 						else
 							_allocator.destroy(&(first[0]));
 					}
-					_m_finish -= diff;
+					_finish -= diff;
 					return (ret);
 				}
+				//Complexity:
+				// Constant
 				void	swap(vector& x)
 				{
-					pointer	tmp_start = x._m_start;
-					pointer	tmp_finish = x._m_finish;
-					pointer	tmp_end_of_storage = x._m_end_of_storage;
+					pointer	tmp_start = x._start;
+					pointer	tmp_finish = x._finish;
+					pointer	tmp_end_of_storage = x._end_of_storage;
 					Alloc	tmp_allocator = x._allocator;
 
-					x._m_start = this->_m_start;
-					x._m_finish = this->_m_finish;
-					x._m_end_of_storage = this->_m_end_of_storage;
+					x._start = this->_start;
+					x._finish = this->_finish;
+					x._end_of_storage = this->_end_of_storage;
 					x._allocator = this->_allocator;
-					this->_m_start = tmp_start;
-					this->_m_finish = tmp_finish;
-					this->_m_end_of_storage = tmp_end_of_storage;
+					this->_start = tmp_start;
+					this->_finish = tmp_finish;
+					this->_end_of_storage = tmp_end_of_storage;
 					this->_allocator = tmp_allocator;
 				}
+				//Complexity:
+				// Linear in the size of the container, i.e., the number of elements
 				void	clear()
 				{
-					for (pointer i = _m_start; i < _m_finish; ++i)
+					for (pointer i = _start; i < _finish; ++i)
 						_allocator.destroy(i);
-					_m_finish = _m_start;
+					_finish = _start;
 				}
 				//allocator
+				//Complexity:
+				// Constant
 				allocator_type	get_allocator() const
 				{
 					return (_allocator);
 				}
 			private:
-				pointer	_m_start;
-				pointer	_m_finish;
-				pointer	_m_end_of_storage;
+				pointer	_start;
+				pointer	_finish;
+				pointer	_end_of_storage;
 				Alloc	_allocator;
 
 				//sub assign function
+				template<typename Integer>
+					void
+					_assign_dispatch(Integer n, Integer val, true_type)
+					{
+						_fill_assign(n, val);
+					}
+				template<typename InputIterator>
+					void
+					_assign_dispatch(InputIterator first, InputIterator last, false_type)
+					{
+						_M_assign_aux(first, last, typename ft::iterator_traits<InputIterator>::iterator_category());
+					}
+				//Replaces the contents with n copies of value val
+				void		_fill_assign(size_type n, const value_type& val)
+				{
+					erase(begin(), end());
+					insert(begin(), n, val);
+				}
+				//Replaces the contents with copies of those in the range [first, last).
+				//The behavior is undefined if either argument is an iterator into *this
 				template<typename InputIterator>
 					void
 					_M_assign_aux(InputIterator first, InputIterator last,
@@ -339,22 +447,24 @@ namespace ft
 						erase(begin(), end());
 						insert(begin(), first, last);
 					}
-				template<typename _Integer>
-					void
-					_M_assign_dispatch(_Integer __n, _Integer __val, true_type)
-					{ _M_fill_assign(__n, __val); }
-				template<typename _InputIterator>
-					void
-					_M_assign_dispatch(_InputIterator __first, _InputIterator __last,
-							false_type)
-					{ _M_assign_aux(__first, __last, typename ft::iterator_traits<_InputIterator>::iterator_category()); }
-				void		_M_fill_assign(size_type n, const value_type& val)
-				{
-					erase(begin(), end());
-					insert(begin(), n, val);
-				}
 				//sub insert function
-				void		_M_fill_insert(iterator position, size_type n, const value_type& val)
+				template<typename InputIterator>
+					void
+					_insert_dispatch(iterator pos, InputIterator first,
+							InputIterator last, false_type)
+					{
+						_range_insert(pos, first, last,
+								typename ft::iterator_traits<InputIterator>::iterator_category());
+					}
+				template<typename Integer>
+					void
+					_insert_dispatch(iterator pos, Integer n, Integer val,
+							true_type)
+					{
+						_fill_insert(pos, n, val);
+					}
+				//inserts n copies of val before position
+				void	_fill_insert(iterator position, size_type n, const value_type& val)
 				{
 					const difference_type	diff = position - begin();
 
@@ -369,17 +479,19 @@ namespace ft
 					}
 					for (difference_type i = size() - 1; i >= diff; i--)
 					{
-						_allocator.construct(&_m_start[i + n], _m_start[i]);
-						_allocator.destroy(&_m_start[i]);
+						_allocator.construct(&_start[i + n], _start[i]);
+						_allocator.destroy(&_start[i]);
 					}
 					for (size_type i = diff; i < diff + n; i++)
-						_allocator.construct(&_m_start[i], val);
-					_m_finish += n;
+						_allocator.construct(&_start[i], val);
+					_finish += n;
 				}
-				template<typename _InputIterator>
+				//inserts elements from range [first, last) before pos.
+				//The behavior is undefined if first and last are iterators into *this
+				template<typename InputIterator>
 					void
-					_M_range_insert(iterator pos, _InputIterator first,
-							_InputIterator last, std::input_iterator_tag)
+					_range_insert(iterator pos, InputIterator first,
+							InputIterator last, std::input_iterator_tag)
 					{
 						if (pos == end())
 						{
@@ -392,54 +504,53 @@ namespace ft
 								insert(begin() + i, *first);
 						}
 					}
-				template<typename _InputIterator>
-					void
-					_M_insert_dispatch(iterator __pos, _InputIterator __first,
-							_InputIterator __last, false_type)
-					{
-						_M_range_insert(__pos, __first, __last,
-								typename ft::iterator_traits<_InputIterator>::iterator_category());
-					}
-				template<typename _Integer>
-					void
-					_M_insert_dispatch(iterator __pos, _Integer __n, _Integer __val,
-							true_type)
-					{
-						_M_fill_insert(__pos, __n, __val);
-					}
 		};
 	//non member function overloads
+	//Complexity:
+	// Constant if lhs and rhs are of different size, otherwise linear in the size of the vector
 	template <class T, class Alloc>
 		bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return (lhs.size() == rhs.size()
 					&& ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 		}
+	//Complexity:
+	// Constant if lhs and rhs are of different size, otherwise linear in the size of the vector
 	template <class T, class Alloc>
 		bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return (!(lhs == rhs));
 		}
+	//Complexity:
+	// Linear in the size of the vector
 	template <class T, class Alloc>
 		bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 		}
+	//Complexity:
+	// Linear in the size of the vector
 	template <class T, class Alloc>
 		bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return (!(rhs < lhs));
 		}
+	//Complexity:
+	// Linear in the size of the vector
 	template <class T, class Alloc>
 		bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return (rhs < lhs);
 		}
+	//Complexity:
+	// Linear in the size of the vector
 	template <class T, class Alloc>
 		bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 		{
 			return (!(lhs < rhs));
 		}
+	//Complexity:
+	// Linear in the size of the vector
 	template <class T, class Alloc>
 		void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
 		{
