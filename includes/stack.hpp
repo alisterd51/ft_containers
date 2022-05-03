@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:21:42 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/02 23:30:49 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/03 13:34:59 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,30 +93,40 @@ namespace ft
 		{
 			return (x._getC() == y._getC());
 		}
+	//Complexity:
+	// Linear in the size of the container
 	template <class T, class Container>
 		bool operator< (const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
 			return (x._getC() < y._getC());
 		}
+	//Complexity:
+	// Linear in the size of the container
 	template <class T, class Container>
 		bool operator!=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
 			return (x._getC() != y._getC());
 		}
+	//Complexity:
+	// Linear in the size of the container
 	template <class T, class Container>
 		bool operator> (const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
 			return (x._getC() > y._getC());
 		}
+	//Complexity:
+	// Linear in the size of the container
 	template <class T, class Container>
 		bool operator>=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
 			return (x._getC() >= y._getC());
 		}
+	//Complexity:
+	// Linear in the size of the container
 	template <class T, class Container>
 		bool operator<=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
