@@ -7,17 +7,21 @@ int	main()
 	typedef std::_Select1st<pair_value>			select;
 	typedef std::less<type_key>					less;
 	typedef std::allocator<pair_value>			alloc;
-	typedef __ft::RBnode<type_key, pair_value, select, less, alloc>
-												node_type;
-	pair_value	product1(42, 21.1);
-/*	node_type	*root = new node_type(product1);
-	for (int i = 0; i < 3; ++i)
+	typedef __ft::RBtree<type_key, pair_value, select, less, alloc>
+												tree_type;
+	tree_type	tree;
+	
+	for (int i = 0; i < 20; ++i)
 	{
-		pair_value	product(i, 21.1);
-		node_type*	node = new node_type(product);
+		int	key;
+
+		if (i % 2)
+			key = i;
+		else
+			key = -i;
+		pair_value	product(key, 21.1);
 		
-		root = insertion(root, node);
+		tree.insert(product);
 	}
-	root->print();*/
-	node_type	rbTree;
+	tree.print();
 }

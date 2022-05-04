@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/04 15:19:16 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/04 18:40:37 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <memory>
 # include <iostream>
 # include <iomanip>
+# include <cassert>
 
 # define _FT_RB_TREE_BLACK	0
 # define _FT_RB_TREE_RED	1
@@ -23,6 +24,7 @@
 
 namespace __ft
 {
+	//https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
 		struct RBnode
 		{
@@ -31,6 +33,50 @@ namespace __ft
 			RBnode	*right;
 			int		color;
 			_Val	value;
+			_Alloc	_allocator;
+
+			RBnode(_Val newValue) :
+				parent(_FT_RB_TREE_LEAF),
+				left(_FT_RB_TREE_LEAF),
+				right(_FT_RB_TREE_LEAF),
+				color(_FT_RB_TREE_BLACK),
+				_allocator(_Alloc())
+			{
+				_allocator.construct(&value, newValue);
+			}
+			~RBnode()
+			{
+				_allocator.destroy(&value);
+			}
+			void	insert(RBnode *new_node)
+			{
+				if (_Compare{}(this->value.first, new_node->value.first))
+				{
+					if (this->left != NULL)
+						this->left->insert(new_node);
+					else
+						 this->left = new_node;
+				}
+				else
+				{
+					if (this->right != NULL)
+						this->right->insert(new_node);
+					else
+						 this->right = new_node;
+				}
+			}
+			void	recursive_print(int deep)
+			{
+				if (deep < 0)
+					return ;
+				if (this->left != _FT_RB_TREE_LEAF)
+					this->left->recursive_print(deep + 1);
+				std::cout << std::setw(deep) << ""
+					<< value.first << ": "
+					<< value.second << std::endl;
+				if (this->right != _FT_RB_TREE_LEAF)
+					this->right->recursive_print(deep + 1);
+			}
 		};
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
 		struct RBtree
@@ -40,14 +86,95 @@ namespace __ft
 			public:
 				_RBnode	*root;
 
-				RBtree	*right_rotation(RBnode *subtree)
+				RBtree() :
+					root(NULL)
 				{
-					RBnode	*G = subtree->parent;
-					RBnode	*S = subtree->left;
-					RBnode	*C;
-
-					//https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
 				}
+				~RBtree()
+				{
+					recursive_remove(this->root);
+				}
+				void	recursive_remove(_RBnode *node)
+				{
+					if (node != NULL)
+					{
+						recursive_remove(node->left);
+						recursive_remove(node->right);
+						delete node;
+					}
+				}
+				RBtree	*right_rotation(_RBnode *subtree)
+				{
+					_RBnode	*G = subtree->parent;
+					_RBnode	*S = subtree->left;
+					_RBnode	*C;
+
+					assert(S != NULL);
+					C = S->right;
+					subtree->left = C;
+					if (C != NULL)
+						C->parent = subtree;
+					S->right = subtree;
+					subtree->parent = S;
+					S->parent = G;
+					if (G != NULL)
+					{
+						if (subtree == G->right)
+							G->right = S;
+						else
+							G->left = S;
+					}
+					else
+						this->root = S;
+					return (S);
+				}
+				RBtree	*left_rotation(_RBnode *subtree)
+				{
+					_RBnode	*G = subtree->parent;
+					_RBnode	*S = subtree->right;
+					_RBnode	*C;
+
+					assert(S != NULL);
+					C = S->left;
+					subtree->right = C;
+					if (C != NULL)
+						C->parent = subtree;
+					S->left = subtree;
+					subtree->parent = S;
+					S->parent = G;
+					if (G != NULL)
+					{
+						if (subtree == G->right)
+							G->right = S;
+						else
+							G->left = S;
+					}
+					else
+						this->root = S;
+					return (S);
+				}
+				void	insert(_RBnode *new_node)
+				{
+					if (this->root == _FT_RB_TREE_LEAF)
+						this->root = new_node;
+					else
+						this->root->insert(new_node);
+				}
+				void	insert(_Val value)
+				{
+					_RBnode	*new_node = new _RBnode(value);
+
+					this->insert(new_node);
+				}
+				void	_print(_RBnode *node)
+				{
+					node->recursive_print(0);
+				}
+				void	print()
+				{
+					_print(this->root);
+				}
+				void	insert1(_RBnode *N, _RBnode *P);
 		};
 }
 
