@@ -11,7 +11,7 @@ int	main()
 												tree_type;
 	tree_type	tree;
 	
-	for (int i = 0; i < 20; ++i)
+	for (int i = 0; i < 50; ++i)
 	{
 		int	key;
 
