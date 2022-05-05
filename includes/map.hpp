@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/05 17:46:47 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/05 19:02:16 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,21 +98,31 @@ namespace __ft
 					}
 				}
 			}
-			void	print_deep(int deep)
+			void	print_recursive_space()
 			{
-				for (; deep > 0; --deep)
-					std::cout << "┊";
-				//print "║" or " "
+				if (parent == NULL)
+					return ;
+				parent->print_recursive_space();
+				if (parent && parent->parent
+						&& ((parent->left == this && parent->parent->right == parent)
+							|| (parent->right == this && parent->parent->left == parent)))
+					std::cout << "║";
+				else
+					std::cout << " ";
 			}
-			void	print_node(int deep, int direction)
+			void	print_direction(int direction)
 			{
-				print_deep(deep);
 				if (direction == 0)
 					std::cout << "═";
 				else if (direction == 1)
 					std::cout << "╔";
 				else if (direction == 2)
 					std::cout << "╚";
+				else
+					std::cout << " ";
+			}
+			void	print_bypass()
+			{
 				if (left == _FT_RB_TREE_LEAF && right == _FT_RB_TREE_LEAF)
 					std::cout << "═";
 				else if (left != _FT_RB_TREE_LEAF && right != _FT_RB_TREE_LEAF)
@@ -121,6 +131,12 @@ namespace __ft
 					std::cout << "╦";
 				else if (left != _FT_RB_TREE_LEAF && right == _FT_RB_TREE_LEAF)
 					std::cout << "╩";
+			}
+			void	print_node(int deep, int direction)
+			{
+				print_recursive_space();
+				print_direction(direction);
+				print_bypass();
 				std::cout << (color == _FT_RB_TREE_BLACK ? _FT_BLACK : _FT_RED)
 					<< value.first << ": " << value.second << _FT_RESET
 					<< std::endl;
