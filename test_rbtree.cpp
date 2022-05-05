@@ -1,5 +1,7 @@
 #include "map.hpp"
 
+#include <map>
+
 int	main()
 {
 	typedef int									type_key;
@@ -10,18 +12,12 @@ int	main()
 	typedef __ft::RBtree<type_key, pair_value, select, less, alloc>
 												tree_type;
 	tree_type	tree;
+//	std::map<int,double> mymap;
 	
 	for (int i = 0; i < 50; ++i)
 	{
-		int	key;
-
-		if (i % 2)
-			key = i;
-		else
-			key = -i;
-		pair_value	product(key, 21.1);
-		
-		tree.insert(product);
+		tree.insert(pair_value(i, 21.1));
+//		mymap.insert(pair_value(i, 21.1));
 	}
 	tree.print();
 }
