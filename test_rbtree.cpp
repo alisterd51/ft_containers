@@ -19,5 +19,6 @@ int	main()
 		tree.insert(pair_value(i, 21.1));
 //		mymap.insert(pair_value(i, 21.1));
 	}
-	tree.print();
+	std::cout << tree.search(64);
+//	tree.print();
 }

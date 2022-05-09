@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/05 19:02:16 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/09 04:13:07 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,6 +227,71 @@ namespace __ft
 					else
 						this->root = S;
 					return (S);
+				}
+				_RBnode	*search(_Key key)
+				{
+					_RBnode	*node;
+
+					node = this->root;
+					while (node && (_Compare{}(node->value.first, key)
+							 || _Compare{}(key, node->value.first)))
+					{
+						if (_Compare{}(node->value.first, key))
+							node = node->left;
+						else
+							node = node->right;
+					}
+					return (node);
+				}
+				void	delete_node(_RBnode *node)
+				{
+					if (node != NULL)
+					{
+						_RBnode	*P = node->parent;
+						int		dir = (P->left == node ? 0 : 1);
+						_RBnode	*S;
+						_RBnode	*C;
+						_RBnode	*D;
+
+						if (dir == 0)
+							P->left = _FT_RB_TREE_LEAF;
+						else
+							P->right = _FT_RB_TREE_LEAF;
+						/////////////////////pas fini
+						while (P != NULL)
+						{
+							if (dir == 0)
+							{
+								S = P->right;
+								D = S->right;
+								C = S->left;
+							}
+							else
+							{
+								S = P->left;
+								D = S->left;
+								C = S->right;
+							}
+							if (S->color == _FT_RB_TREE_RED)
+								;
+							else if (D != _FT_RB_TREE_LEAF && D->color == _FT_RB_TREE_RED)
+								;
+							else if (C != _FT_RB_TREE_LEAF && C->color == _FT_RB_TREE_RED)
+								;
+							else if (P->color == RED)
+								;
+							else
+							{
+								S->color = _FT_RB_TREE_RED;
+								N = P;
+							}
+							P = N->parent;
+						}
+					}
+				}
+				void	delete_key(_Key key)
+				{
+					this->delete_node(search(key));
 				}
 				void	insert(_RBnode *new_node)
 				{
