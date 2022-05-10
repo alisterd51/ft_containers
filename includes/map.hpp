@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/10 17:29:30 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/11 00:40:22 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,29 +253,66 @@ namespace __ft
 				void	balancing_double_black(_RBnode *db_node, _RBnode *db_parent)
 				{
 					_RBnode	*db_brother = NULL;
+					_RBnode	*db_furthest_nephew = NULL;
+					_RBnode	*db_grandparent = NULL;
 
 					if (db_parent)
 					{
 						if (db_parent->left == db_node)
+						{
 							db_brother = db_parent->right;
+							if (db_brother != NULL)
+								db_furthest_nephew = db_brother->right;
+						}
 						else
+						{
 							db_brother = db_parent->left;
+							if (db_brother != NULL)
+								db_furthest_nephew = db_brother->left;
+						}
+						db_grandparent = db_parent->parent;
 					}
 					//cas 0 le nœud x est la racine de l'arbre
 					if (db_parent == NULL)
 					{
 						db_node->color = _FT_RB_TREE_BLACK;
 					}
-					//cas 1  le frère f de x est noir.
+					//cas 1 le frère f de x est noir.
 					else if (db_brother == NULL || db_brother->color == _FT_RB_TREE_BLACK)
 					{
-						//cas 1a
-						//cas 1b
+						//cas 1a les deux fils g et d de f sont noirs.
+						if (db_brother
+								&& (db_brother->left == NULL || db_brother->left->color == _FT_RB_TREE_BLACK)
+								&& (db_brother->right == NULL || db_brother->right->color == _FT_RB_TREE_BLACK))
+						{
+							db_brother->color = _FT_RB_TREE_RED;
+							if (db_parent && db_parent->color == _FT_RB_TREE_RED)
+								db_parent->color = _FT_RB_TREE_BLACK;
+							else
+								balancing_double_black(db_parent, db_grandparent);
+						}
+						//cas 1b le fils droit d de f est rouge.
+						else if (db_furthest_nephew != NULL && db_furthest_nephew->color == _FT_RB_TREE_RED)
+						{
+							if (db_brother == db_parent->right)
+								left_rotation(db_parent);
+							else
+								right_rotation(db_parent);
+							db_brother->color = db_parent->color;
+							db_node->color = _FT_RB_TREE_BLACK;
+							db_parent->color = _FT_RB_TREE_BLACK;
+							db_furthest_nephew->color = _FT_RB_TREE_BLACK;
+						}
 						//cas 1c
+						else
+						{
+							std::cout << "test23" << std::endl;
+						}
 					}
 					//cas 3 le frère f de x est rouge.
 					else
 					{
+						std::cout << "test3" << std::endl;
 					}
 				}
 				void	erase(_RBnode *node)

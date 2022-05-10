@@ -34,4 +34,11 @@ int	main()
 	tree.print();
 	tree.erase(4);
 	tree.print();
+	tree.erase(7);
+	tree.erase(8);
+	tree.erase(2);
+	tree.erase(0);
+	tree.print();
+	tree.balancing_double_black(tree.search(1), tree.search(3));
+	tree.print();
 }
