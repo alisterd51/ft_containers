@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/10 12:42:47 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/10 17:29:30 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,9 +137,7 @@ namespace __ft
 				print_recursive_space();
 				print_direction(direction);
 				print_bypass();
-				std::cout << (color == _FT_RB_TREE_BLACK ? _FT_BLACK : _FT_RED)
-					<< value.first << ": " << value.second << _FT_RESET
-					<< std::endl;
+				std::cout << *this << std::endl;
 			}
 			void	recursive_print(int deep, int direction)
 			{
@@ -152,6 +150,14 @@ namespace __ft
 					this->right->recursive_print(deep + 1, 2);
 			}
 		};
+
+	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
+		std::ostream	&operator<<(std::ostream &o, __ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc> const &i)
+		{
+			o << (i.color == _FT_RB_TREE_BLACK ? _FT_BLACK : _FT_RED)
+				<< i.value.first << ": " << i.value.second << _FT_RESET;
+			return (o);
+		}
 
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
 		struct RBtree
@@ -234,7 +240,7 @@ namespace __ft
 
 					node = this->root;
 					while (node && (_Compare{}(node->value.first, key)
-							 || _Compare{}(key, node->value.first)))
+								|| _Compare{}(key, node->value.first)))
 					{
 						if (_Compare{}(node->value.first, key))
 							node = node->left;
@@ -243,41 +249,89 @@ namespace __ft
 					}
 					return (node);
 				}
-				void	erase(_RBnode *node)
+				////////////////////////////////////////////////////////////////
+				void	balancing_double_black(_RBnode *db_node, _RBnode *db_parent)
 				{
-					if (node != NULL)
-					{
-						_RBnode	*P = node->parent;
-						_RBnode	*L = node->left;
-						_RBnode	*R = node->right;
-						_RBnode	*B = node->brother();
-						_RBnode	**C;
+					_RBnode	*db_brother = NULL;
 
-						if (P == NULL)
-							C = &this->root;
-						else if (node == P->left)
-							C = &P->left;
+					if (db_parent)
+					{
+						if (db_parent->left == db_node)
+							db_brother = db_parent->right;
 						else
-							C = &P->right;
-						if (L == _FT_RB_TREE_LEAF || R == _FT_RB_TREE_LEAF)
-						{
-							delete node;
-							if (L != _FT_RB_TREE_LEAF)
-								*C = L;
-							else
-								*C = R;
-							//base
-							if (*C != NULL)
-								(*C)->parent = P;
-							//cas 0
-							if (P == NULL)
-							{
-								if (*C != NULL)
-									(*C)->color = _FT_RB_TREE_BLACK;
-							}
-						}
+							db_brother = db_parent->left;
+					}
+					//cas 0 le nœud x est la racine de l'arbre
+					if (db_parent == NULL)
+					{
+						db_node->color = _FT_RB_TREE_BLACK;
+					}
+					//cas 1  le frère f de x est noir.
+					else if (db_brother == NULL || db_brother->color == _FT_RB_TREE_BLACK)
+					{
+						//cas 1a
+						//cas 1b
+						//cas 1c
+					}
+					//cas 3 le frère f de x est rouge.
+					else
+					{
 					}
 				}
+				void	erase(_RBnode *node)
+				{
+					int		node_color = _FT_RB_TREE_BLACK;
+					_RBnode	*node_children = _FT_RB_TREE_LEAF;
+					_RBnode	*node_parent = NULL;
+
+					if (node)
+					{
+						node_color = node->color;
+						if (node->left != _FT_RB_TREE_LEAF)
+							node_children = node->left;
+						else
+							node_children = node->right;
+						node_parent = node->parent;
+					}
+					if (node != _FT_RB_TREE_LEAF)
+					{
+						//cas 0 ou 1 fils
+						if (node->left == _FT_RB_TREE_LEAF
+								|| node->right == _FT_RB_TREE_LEAF)
+						{
+							//maj noeud parent
+							if (node_parent == NULL)
+								this->root = node_children;
+							else if (node_parent->left == node)
+								node_parent->left = node_children;
+							else
+								node_parent->right = node_children;
+							//maj noeud enfant
+							if (node_children)
+								node_children->parent = node_parent;
+							//delete node
+							delete node;
+							//balance
+							if (node_color == _FT_RB_TREE_BLACK)
+							{
+								if (node_children && node_children->color == _FT_RB_TREE_RED)
+									node_children->color = _FT_RB_TREE_BLACK;
+								else
+									balancing_double_black(node_children, node_parent);
+							}
+							else
+							{
+								//Si le nœud supprimé est rouge, la propriété (3) reste vérifiée. 
+							}
+						}
+						//cas 2 fils
+						else
+						{
+						}
+					}
+					//https://www.irif.fr/~carton/Enseignement/Algorithmique/Programmation/RedBlackTree/
+				}
+				////////////////////////////////////////////////////////////////
 				void	erase(_Key key)
 				{
 					this->erase(search(key));

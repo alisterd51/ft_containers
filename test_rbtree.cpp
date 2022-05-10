@@ -14,14 +14,24 @@ int	main()
 	tree_type	tree;
 //	std::map<int,double> mymap;
 	
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 15; ++i)
 	{
 		tree.insert(pair_value(i, i * 1.1));
 //		mymap.insert(pair_value(i, 21.1));
 	}
 	tree.print();
-	tree.erase(0);
+	tree.erase(14);
 	tree.print();
-	tree.erase(1);
+	tree.erase(12);
+	tree.print();
+	tree.erase(13);
+	tree.print();
+	tree.erase(11);
+	tree.print();
+	tree.erase(6);
+	tree.print();
+	tree.erase(5);
+	tree.print();
+	tree.erase(4);
 	tree.print();
 }
