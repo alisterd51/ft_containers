@@ -14,31 +14,16 @@ int	main()
 	tree_type	tree;
 //	std::map<int,double> mymap;
 	
-	for (int i = 0; i < 15; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		tree.insert(pair_value(i, i * 1.1));
 //		mymap.insert(pair_value(i, 21.1));
 	}
 	tree.print();
-	tree.erase(14);
+	tree.search(4)->color = _FT_RB_TREE_BLACK;
+	tree.search(2)->color = _FT_RB_TREE_BLACK;
+	tree.search(3)->color = _FT_RB_TREE_RED;
 	tree.print();
-	tree.erase(12);
-	tree.print();
-	tree.erase(13);
-	tree.print();
-	tree.erase(11);
-	tree.print();
-	tree.erase(6);
-	tree.print();
-	tree.erase(5);
-	tree.print();
-	tree.erase(4);
-	tree.print();
-	tree.erase(7);
-	tree.erase(8);
-	tree.erase(2);
-	tree.erase(0);
-	tree.print();
-	tree.balancing_double_black(tree.search(1), tree.search(3));
+	tree.balancing_double_black(tree.search(0), tree.search(1));
 	tree.print();
 }

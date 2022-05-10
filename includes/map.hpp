@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/11 00:40:22 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/11 01:28:29 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,6 +254,7 @@ namespace __ft
 				{
 					_RBnode	*db_brother = NULL;
 					_RBnode	*db_furthest_nephew = NULL;
+					_RBnode	*db_furthest_nephew_brother = NULL;
 					_RBnode	*db_grandparent = NULL;
 
 					if (db_parent)
@@ -262,13 +263,19 @@ namespace __ft
 						{
 							db_brother = db_parent->right;
 							if (db_brother != NULL)
+							{
 								db_furthest_nephew = db_brother->right;
+								db_furthest_nephew_brother = db_brother->left;
+							}
 						}
 						else
 						{
 							db_brother = db_parent->left;
 							if (db_brother != NULL)
+							{
 								db_furthest_nephew = db_brother->left;
+								db_furthest_nephew_brother = db_brother->right;
+							}
 						}
 						db_grandparent = db_parent->parent;
 					}
@@ -303,16 +310,38 @@ namespace __ft
 							db_parent->color = _FT_RB_TREE_BLACK;
 							db_furthest_nephew->color = _FT_RB_TREE_BLACK;
 						}
-						//cas 1c
-						else
+						//cas 1c le fils droit d est noir et le fils gauche g est rouge.
+						else if (db_furthest_nephew_brother != NULL
+								&& db_furthest_nephew_brother->color == _FT_RB_TREE_RED)
 						{
-							std::cout << "test23" << std::endl;
+							if (db_brother == db_parent->right)
+							{
+								right_rotation(db_brother);
+								db_furthest_nephew_brother->color = _FT_RB_TREE_BLACK;
+								db_brother->color = _FT_RB_TREE_RED;
+								left_rotation(db_parent);
+								db_brother->color = _FT_RB_TREE_BLACK;
+							}
+							else
+							{
+								left_rotation(db_brother);
+								db_furthest_nephew_brother->color = _FT_RB_TREE_BLACK;
+								db_brother->color = _FT_RB_TREE_RED;
+								right_rotation(db_parent);
+								db_brother->color = _FT_RB_TREE_BLACK;
+							}
 						}
 					}
 					//cas 3 le frère f de x est rouge.
 					else
 					{
-						std::cout << "test3" << std::endl;
+						if (db_brother == db_parent->right)
+							left_rotation(db_parent);
+						else
+							right_rotation(db_parent);
+						db_parent->color = _FT_RB_TREE_RED;
+						db_brother->color = _FT_RB_TREE_BLACK;
+						balancing_double_black(db_node, db_parent);
 					}
 				}
 				void	erase(_RBnode *node)
