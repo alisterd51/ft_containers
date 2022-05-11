@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/11 14:33:13 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/11 15:16:21 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <iostream>
 # include <iomanip>
 # include <cassert>
+# include "iterator.hpp"
 
 # define _FT_RB_TREE_BLACK	0
 # define _FT_RB_TREE_RED	1
@@ -169,9 +170,19 @@ namespace __ft
 		{
 			private:
 				typedef	__ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc>	_RBnode;
+			public:
+				typedef _Val									value_type;
+//				typedef	__ft::Rbtree_iterator<value_type>		iterator;
+//				typedef	__ft::Rbtree_const_iterator<value_type>	const_iterator;
+//				typedef	ft::reverse_iterator<iterator>			reverse_iterator;
+//				typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+				typedef std::size_t									size_type;
+				typedef	std::ptrdiff_t								difference_type;
+
+			private:
 				_Compare	_compare;
 			public:
-				_RBnode	*root;
+				_RBnode		*root;
 
 				RBtree() :
 					root(NULL),
@@ -526,10 +537,8 @@ namespace ft
 				typedef Compare									key_compare;
 				typedef Allocator								allocator_type;
 			private:
-				typedef typename __gnu_cxx::__alloc_traits<Allocator>::template
-					rebind<value_type>::other					_Pair_alloc_type;
 				typedef __ft::RBtree<key_type, value_type, std::_Select1st<value_type>,
-						key_compare, _Pair_alloc_type>			_Rep_type;
+						key_compare, allocator_type>			_Rep_type;
 			public:
 				typedef typename Allocator::reference			reference;
 				typedef typename Allocator::const_reference 	const_reference;
