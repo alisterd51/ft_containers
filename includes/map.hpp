@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/11 14:14:45 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/11 14:33:13 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -438,14 +438,12 @@ namespace __ft
 				void	insert(_Val value)
 				{
 					_RBnode	*new_node = new _RBnode(value);
-					_RBnode	*new_root;
 
 					this->insert(new_node);
 					this->balancing(new_node);
-					new_root = new_node;
-					while (new_root->parent != NULL)
-						new_root = new_root->parent;
-					this->root = new_root;
+					while (new_node->parent != NULL)
+						new_node = new_node->parent;
+					this->root = new_node;
 				}
 				void	balancing(_RBnode *n)
 				{
