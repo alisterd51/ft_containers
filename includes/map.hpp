@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/11 05:31:54 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/11 14:14:45 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ namespace __ft
 			RBnode		*left;
 			RBnode		*right;
 			int			color;
-			_Val		value;
+			_Val		*value;
 			_Alloc		_allocator;
 			_Compare	_compare;
 
@@ -49,11 +49,13 @@ namespace __ft
 				_allocator(_Alloc()),
 				_compare(_Compare())
 			{
-				_allocator.construct(&value, newValue);
+				value = _allocator.allocate(1);
+				_allocator.construct(value, newValue);
 			}
 			~RBnode()
 			{
-				_allocator.destroy(&value);
+				_allocator.destroy(value);
+				_allocator.deallocate(value, 1);
 			}
 			RBnode	*grandparent()
 			{
@@ -80,7 +82,7 @@ namespace __ft
 			}
 			void	insert(RBnode *new_node)
 			{
-				if (_compare(this->value.first, new_node->value.first))
+				if (_compare(this->value->first, new_node->value->first))
 				{
 					if (this->left != NULL)
 						this->left->insert(new_node);
@@ -158,7 +160,7 @@ namespace __ft
 		std::ostream	&operator<<(std::ostream &o, __ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc> const &i)
 		{
 			o << (i.color == _FT_RB_TREE_BLACK ? _FT_BLACK : _FT_RED)
-				<< i.value.first << ": " << i.value.second << _FT_RESET;
+				<< i.value->first << ": " << i.value->second << _FT_RESET;
 			return (o);
 		}
 
@@ -244,10 +246,10 @@ namespace __ft
 					_RBnode	*node;
 
 					node = this->root;
-					while (node && (_compare(node->value.first, key)
-								|| _compare(key, node->value.first)))
+					while (node && (_compare(node->value->first, key)
+								|| _compare(key, node->value->first)))
 					{
-						if (_compare(node->value.first, key))
+						if (_compare(node->value->first, key))
 							node = node->left;
 						else
 							node = node->right;
@@ -351,43 +353,11 @@ namespace __ft
 				}
 				void	swap(_RBnode *node1, _RBnode *node2)
 				{
-					_RBnode	tmp(node1->value);
+					_Val	*tmp;
 
-					tmp.parent = node1->parent;
-					tmp.left = node1->left;
-					tmp.right = node1->right;
-					tmp.color = node1->color;
-					if (this->root == node2)
-						this->root = node1;
-					else if (this->root == node1)
-						this->root = node2;
-					if (node2->parent == node1)
-						node1->parent = node2;
-					else
-						node1->parent = node2->parent;
-					if (node2->left == node1)
-						node1->left = node2;
-					else
-						node1->left = node2->left;
-					if (node2->right == node1)
-						node1->right = node2;
-					else
-						node1->right = node2->right;
-					node1->color = node2->color;
-					
-					if (tmp.parent == node2)
-						node2->parent = node1;
-					else
-						node2->parent = tmp.parent;
-					if (tmp.left == node2)
-						node2->left = node1;
-					else
-						node2->left = tmp.left;
-					if (node2->right == node1)
-						node2->right = node1;
-					else
-						node2->right = tmp.right;
-					node2->color = tmp.color;
+					tmp = node1->value;
+					node1->value = node2->value;
+					node2->value = tmp;
 				}
 				void	erase(_RBnode *node)
 				{
@@ -409,19 +379,20 @@ namespace __ft
 						//cas 2 fils
 						if (node->left != _FT_RB_TREE_LEAF                    
                                 && node->right != _FT_RB_TREE_LEAF)
-						{/*
+						{
 							_RBnode	*test;
-							_RBnode	tmp(node->value);
+							_RBnode	tmp(*(node->value));
 
 							test = node->left;
 							while (test->right)
 								test = test->right;
 							//swap
-						//	swap(node, test);
-							node = test;
-						*/}
+							swap(node, test);
+							this->print();
+							erase(test);
+						}
 						//cas 0 ou 1 fils
-						if (node->left == _FT_RB_TREE_LEAF
+						else if (node->left == _FT_RB_TREE_LEAF
 								|| node->right == _FT_RB_TREE_LEAF)
 						{
 							//maj noeud parent
