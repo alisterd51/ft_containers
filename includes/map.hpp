@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/11 01:28:29 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/11 05:31:54 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MAP_HPP
 
 # include <memory>
+# include <algorithm>
 # include <iostream>
 # include <iomanip>
 # include <cassert>
@@ -32,19 +33,21 @@ namespace __ft
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
 		struct RBnode
 		{
-			RBnode	*parent;
-			RBnode	*left;
-			RBnode	*right;
-			int		color;
-			_Val	value;
-			_Alloc	_allocator;
+			RBnode		*parent;
+			RBnode		*left;
+			RBnode		*right;
+			int			color;
+			_Val		value;
+			_Alloc		_allocator;
+			_Compare	_compare;
 
 			RBnode(_Val newValue) :
 				parent(_FT_RB_TREE_LEAF),
 				left(_FT_RB_TREE_LEAF),
 				right(_FT_RB_TREE_LEAF),
 				color(_FT_RB_TREE_RED),
-				_allocator(_Alloc())
+				_allocator(_Alloc()),
+				_compare(_Compare())
 			{
 				_allocator.construct(&value, newValue);
 			}
@@ -77,7 +80,7 @@ namespace __ft
 			}
 			void	insert(RBnode *new_node)
 			{
-				if (_Compare{}(this->value.first, new_node->value.first))
+				if (_compare(this->value.first, new_node->value.first))
 				{
 					if (this->left != NULL)
 						this->left->insert(new_node);
@@ -151,7 +154,7 @@ namespace __ft
 			}
 		};
 
-	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
+	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc>
 		std::ostream	&operator<<(std::ostream &o, __ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc> const &i)
 		{
 			o << (i.color == _FT_RB_TREE_BLACK ? _FT_BLACK : _FT_RED)
@@ -164,11 +167,13 @@ namespace __ft
 		{
 			private:
 				typedef	__ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc>	_RBnode;
+				_Compare	_compare;
 			public:
 				_RBnode	*root;
 
 				RBtree() :
-					root(NULL)
+					root(NULL),
+					_compare(_Compare())
 			{
 			}
 				~RBtree()
@@ -239,10 +244,10 @@ namespace __ft
 					_RBnode	*node;
 
 					node = this->root;
-					while (node && (_Compare{}(node->value.first, key)
-								|| _Compare{}(key, node->value.first)))
+					while (node && (_compare(node->value.first, key)
+								|| _compare(key, node->value.first)))
 					{
-						if (_Compare{}(node->value.first, key))
+						if (_compare(node->value.first, key))
 							node = node->left;
 						else
 							node = node->right;
@@ -344,6 +349,46 @@ namespace __ft
 						balancing_double_black(db_node, db_parent);
 					}
 				}
+				void	swap(_RBnode *node1, _RBnode *node2)
+				{
+					_RBnode	tmp(node1->value);
+
+					tmp.parent = node1->parent;
+					tmp.left = node1->left;
+					tmp.right = node1->right;
+					tmp.color = node1->color;
+					if (this->root == node2)
+						this->root = node1;
+					else if (this->root == node1)
+						this->root = node2;
+					if (node2->parent == node1)
+						node1->parent = node2;
+					else
+						node1->parent = node2->parent;
+					if (node2->left == node1)
+						node1->left = node2;
+					else
+						node1->left = node2->left;
+					if (node2->right == node1)
+						node1->right = node2;
+					else
+						node1->right = node2->right;
+					node1->color = node2->color;
+					
+					if (tmp.parent == node2)
+						node2->parent = node1;
+					else
+						node2->parent = tmp.parent;
+					if (tmp.left == node2)
+						node2->left = node1;
+					else
+						node2->left = tmp.left;
+					if (node2->right == node1)
+						node2->right = node1;
+					else
+						node2->right = tmp.right;
+					node2->color = tmp.color;
+				}
 				void	erase(_RBnode *node)
 				{
 					int		node_color = _FT_RB_TREE_BLACK;
@@ -361,6 +406,20 @@ namespace __ft
 					}
 					if (node != _FT_RB_TREE_LEAF)
 					{
+						//cas 2 fils
+						if (node->left != _FT_RB_TREE_LEAF                    
+                                && node->right != _FT_RB_TREE_LEAF)
+						{/*
+							_RBnode	*test;
+							_RBnode	tmp(node->value);
+
+							test = node->left;
+							while (test->right)
+								test = test->right;
+							//swap
+						//	swap(node, test);
+							node = test;
+						*/}
 						//cas 0 ou 1 fils
 						if (node->left == _FT_RB_TREE_LEAF
 								|| node->right == _FT_RB_TREE_LEAF)
@@ -389,10 +448,6 @@ namespace __ft
 							{
 								//Si le nœud supprimé est rouge, la propriété (3) reste vérifiée. 
 							}
-						}
-						//cas 2 fils
-						else
-						{
 						}
 					}
 					//https://www.irif.fr/~carton/Enseignement/Algorithmique/Programmation/RedBlackTree/

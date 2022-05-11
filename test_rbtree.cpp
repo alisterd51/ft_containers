@@ -24,6 +24,6 @@ int	main()
 	tree.search(2)->color = _FT_RB_TREE_BLACK;
 	tree.search(3)->color = _FT_RB_TREE_RED;
 	tree.print();
-	tree.balancing_double_black(tree.search(0), tree.search(1));
+	tree.erase(1);
 	tree.print();
 }
