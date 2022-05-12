@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/11 15:16:21 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/13 01:48:07 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@ namespace __ft
 				else if (left != _FT_RB_TREE_LEAF && right == _FT_RB_TREE_LEAF)
 					std::cout << "╩";
 			}
-			void	print_node(int deep, int direction)
+			void	print_node(int direction)
 			{
 				print_recursive_space();
 				print_direction(direction);
@@ -151,7 +151,7 @@ namespace __ft
 					return ;
 				if (this->left != _FT_RB_TREE_LEAF)
 					this->left->recursive_print(deep + 1, 1);
-				print_node(deep, direction);
+				print_node(direction);
 				if (this->right != _FT_RB_TREE_LEAF)
 					this->right->recursive_print(deep + 1, 2);
 			}
@@ -169,16 +169,23 @@ namespace __ft
 		struct RBtree
 		{
 			private:
+				template<typename _Tp>
+					class Rbtree_iterator
+					{
+					};
+				template<typename _Tp>
+					class Rbtree_const_iterator
+					{
+					};
 				typedef	__ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc>	_RBnode;
 			public:
 				typedef _Val									value_type;
-//				typedef	__ft::Rbtree_iterator<value_type>		iterator;
-//				typedef	__ft::Rbtree_const_iterator<value_type>	const_iterator;
-//				typedef	ft::reverse_iterator<iterator>			reverse_iterator;
-//				typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
-				typedef std::size_t									size_type;
-				typedef	std::ptrdiff_t								difference_type;
-
+				typedef	Rbtree_iterator<value_type>				iterator;
+				typedef	Rbtree_const_iterator<value_type>		const_iterator;
+				typedef	ft::reverse_iterator<iterator>			reverse_iterator;
+				typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+				typedef std::size_t								size_type;
+				typedef	std::ptrdiff_t							difference_type;
 			private:
 				_Compare	_compare;
 			public:
@@ -389,7 +396,7 @@ namespace __ft
 					{
 						//cas 2 fils
 						if (node->left != _FT_RB_TREE_LEAF                    
-                                && node->right != _FT_RB_TREE_LEAF)
+								&& node->right != _FT_RB_TREE_LEAF)
 						{
 							_RBnode	*test;
 							_RBnode	tmp(*(node->value));
@@ -461,7 +468,7 @@ namespace __ft
 					if (n->parent == NULL)
 						balancing_cas1(n);
 					else if (n->parent->color == _FT_RB_TREE_BLACK)
-						balancing_cas2(n);
+						balancing_cas2();
 					else if (n->uncle() && n->uncle()->color == _FT_RB_TREE_RED)
 						balancing_cas3(n);
 					else
@@ -472,7 +479,7 @@ namespace __ft
 					if (n->parent == NULL)
 						n->color = _FT_RB_TREE_BLACK;
 				}
-				void	balancing_cas2(_RBnode *n)
+				void	balancing_cas2()
 				{
 					return ;
 				}
@@ -551,24 +558,38 @@ namespace ft
 				typedef std::reverse_iterator<iterator>			reverse_iterator;
 				typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
 				class value_compare
-					: public std::binary_function<value_type,value_type,bool> {
+					: public std::binary_function<value_type,value_type,bool>
+				{
+					public:
 						friend class map;
-						protected:
+					protected:
 						Compare comp;
 						value_compare(Compare c) : comp(c) {}
-						public:
-						bool operator()(const value_type& x, const value_type& y) const {
+					public:
+						bool operator()(const value_type& x, const value_type& y) const
+						{
 							return comp(x.first, y.first);
 						}
-					};
+				};
+			private:
+				//variables
+				Compare		_compare;
+				Allocator	_allocator;
+			public:
 				// 23.3.1.1 construct/copy/destroy:
 				explicit map(const Compare& comp = Compare(),
-						const Allocator& = Allocator());
+						const Allocator& = Allocator()) :
+					_compare(comp)
+				{
+				}
 				template <class InputIterator>
 					map(InputIterator first, InputIterator last,
-							const Compare& comp = Compare(), const Allocator& = Allocator());
+							const Compare& comp = Compare(),
+							const Allocator& = Allocator());
 				map(const map<Key,T,Compare,Allocator>& x);
-				~map();
+				~map()
+				{
+				}
 				map<Key,T,Compare,Allocator>&
 					operator=(const map<Key,T,Compare,Allocator>& x);
 				// iterators:
