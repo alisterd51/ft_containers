@@ -14,7 +14,7 @@ int	main()
 //	tree_type	tree;
 //	std::map<int,double> mymap;
 	ft::map<int,double> mymap;
-	
+
 	for (int i = 0; i < 15; ++i)
 	{
 //		tree.insert(pair_value(i, i * 1.1));
