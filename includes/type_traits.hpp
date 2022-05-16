@@ -6,7 +6,7 @@
 /*   By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/04 23:51:36 by anclarma          #+#    #+#             */
-/*   Updated: 2022/05/03 13:32:01 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/16 18:04:45 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,6 @@ namespace	ft
 		{
 		};
 	template<>
-		struct is_integral_helper<long long int> : public true_type
-		{
-		};
-	template<>
 		struct is_integral_helper<unsigned char> : public true_type
 		{
 		};
@@ -80,10 +76,6 @@ namespace	ft
 		};
 	template<>
 		struct is_integral_helper<unsigned long int> : public true_type
-		{
-		};
-	template<>
-		struct is_integral_helper<unsigned long long int> : public true_type
 		{
 		};
 
