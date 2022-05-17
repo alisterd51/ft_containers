@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/13 01:48:07 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/17 14:20:22 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,10 +186,6 @@ namespace __ft
 				typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 				typedef std::size_t								size_type;
 				typedef	std::ptrdiff_t							difference_type;
-			private:
-				_Compare	_compare;
-			public:
-				_RBnode		*root;
 
 				RBtree() :
 					root(NULL),
@@ -528,6 +524,10 @@ namespace __ft
 				{
 					_print(this->root);
 				}
+			private:
+				_Compare	_compare;
+			public:
+				_RBnode		*root;
 		};
 }
 
