@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/17 14:20:22 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/17 14:24:34 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -524,10 +524,10 @@ namespace __ft
 				{
 					_print(this->root);
 				}
+				
+				_RBnode		*root;
 			private:
 				_Compare	_compare;
-			public:
-				_RBnode		*root;
 		};
 }
 
