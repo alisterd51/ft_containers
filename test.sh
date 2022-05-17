@@ -15,3 +15,4 @@ cmake --build .
 ./test1
 ./test2
 ./test3
+./stack_test
