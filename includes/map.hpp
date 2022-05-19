@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/17 14:24:34 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/19 10:36:01 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,7 +270,6 @@ namespace __ft
 					}
 					return (node);
 				}
-				////////////////////////////////////////////////////////////////
 				void	balancing_double_black(_RBnode *db_node, _RBnode *db_parent)
 				{
 					_RBnode	*db_brother = NULL;
@@ -429,15 +428,9 @@ namespace __ft
 								else
 									balancing_double_black(node_children, node_parent);
 							}
-							else
-							{
-								//Si le nœud supprimé est rouge, la propriété (3) reste vérifiée. 
-							}
 						}
 					}
-					//https://www.irif.fr/~carton/Enseignement/Algorithmique/Programmation/RedBlackTree/
 				}
-				////////////////////////////////////////////////////////////////
 				void	erase(_Key key)
 				{
 					this->erase(search(key));
@@ -575,23 +568,50 @@ namespace ft
 				//variables
 				Compare		_compare;
 				Allocator	_allocator;
+				_Rep_type	_binary_tree;
 			public:
 				// 23.3.1.1 construct/copy/destroy:
 				explicit map(const Compare& comp = Compare(),
 						const Allocator& = Allocator()) :
-					_compare(comp)
-				{
-				}
+					_compare(comp),
+					_allocator(Allocator()),
+					_binary_tree()
+			{
+			}
 				template <class InputIterator>
 					map(InputIterator first, InputIterator last,
 							const Compare& comp = Compare(),
-							const Allocator& = Allocator());
-				map(const map<Key,T,Compare,Allocator>& x);
+							const Allocator& = Allocator()) :
+						_compare(comp),
+						_allocator(Allocator()),
+						_binary_tree()
+			{
+				for (; first < last; ++first)
+				{
+					_binary_tree.insert(*first);
+				}
+			}
+				map(const map<Key,T,Compare,Allocator>& x) :
+					_compare(Compare()),
+					_allocator(Allocator()),
+					_binary_tree()
+			{
+				*this = x;
+			}
 				~map()
 				{
 				}
 				map<Key,T,Compare,Allocator>&
-					operator=(const map<Key,T,Compare,Allocator>& x);
+					operator=(const map<Key,T,Compare,Allocator>& x)
+					{
+						if (this != &x)
+						{
+							this->_compare = x._compare;
+							this->_allocator = x._allocator;
+							this->_binary_tree = x._binary_tree;
+						}
+						return (*this);
+					}
 				// iterators:
 				iterator begin();
 				const_iterator begin() const;
