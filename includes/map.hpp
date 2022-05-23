@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/19 10:36:01 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/24 01:24:30 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,22 @@ namespace __ft
 				if (this->grandparent() == NULL)
 					return (NULL);
 				return (this->parent->brother());
+			}
+			RBnode	*recursive_copy(RBnode *p)
+			{
+				RBnode	*new_node = new RBnode(*(this->value));
+
+				new_node->parent = p;
+				new_node->color = this->color;
+				if (this->left != NULL)
+					new_node->left = this->left->recursive_copy(new_node);
+				else
+					new_node->left = NULL;
+				if (this->right != NULL)
+					new_node->right = this->right->recursive_copy(new_node);
+				else
+					new_node->right = NULL;
+				return (new_node);
 			}
 			void	insert(RBnode *new_node)
 			{
@@ -195,6 +211,18 @@ namespace __ft
 				~RBtree()
 				{
 					recursive_remove(this->root);
+				}
+				RBtree&	operator=(const RBtree& x)
+				{
+					if (this != &x)
+					{
+						recursive_remove(this->root);
+						if (x.root != NULL)
+							this->root = x.root->recursive_copy(NULL);
+						else
+							this->root = NULL;
+					}
+					return (*this);
 				}
 				void	recursive_remove(_RBnode *node)
 				{
@@ -569,13 +597,15 @@ namespace ft
 				Compare		_compare;
 				Allocator	_allocator;
 				_Rep_type	_binary_tree;
+				size_type	_size;
 			public:
 				// 23.3.1.1 construct/copy/destroy:
 				explicit map(const Compare& comp = Compare(),
 						const Allocator& = Allocator()) :
 					_compare(comp),
 					_allocator(Allocator()),
-					_binary_tree()
+					_binary_tree(),
+					_size(0)
 			{
 			}
 				template <class InputIterator>
@@ -584,9 +614,10 @@ namespace ft
 							const Allocator& = Allocator()) :
 						_compare(comp),
 						_allocator(Allocator()),
-						_binary_tree()
+						_binary_tree(),
+						_size(0)
 			{
-				for (; first < last; ++first)
+				for (; first != last; ++first, ++_size)
 				{
 					_binary_tree.insert(*first);
 				}
@@ -609,6 +640,7 @@ namespace ft
 							this->_compare = x._compare;
 							this->_allocator = x._allocator;
 							this->_binary_tree = x._binary_tree;
+							this->_size = x._size;
 						}
 						return (*this);
 					}
@@ -623,7 +655,10 @@ namespace ft
 				const_reverse_iterator rend() const;
 				// capacity:
 				bool empty() const;
-				size_type size() const;
+				size_type size() const
+				{
+					return (_size);
+				}
 				size_type max_size() const;
 				// 23.3.1.2 element access:
 				T& operator[](const key_type& x);
