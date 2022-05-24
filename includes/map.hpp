@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/24 04:00:54 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/24 16:52:09 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,7 +334,8 @@ namespace __ft
 					//cas 0 le nœud x est la racine de l'arbre
 					if (db_parent == NULL)
 					{
-						db_node->color = _FT_RB_TREE_BLACK;
+						if (db_node != NULL)
+							db_node->color = _FT_RB_TREE_BLACK;
 					}
 					//cas 1 le frère f de x est noir.
 					else if (db_brother == NULL || db_brother->color == _FT_RB_TREE_BLACK)
@@ -433,7 +434,6 @@ namespace __ft
 								test = test->right;
 							//swap
 							swap(node, test);
-							this->print();
 							erase(test);
 						}
 						//cas 0 ou 1 fils
@@ -452,6 +452,7 @@ namespace __ft
 								node_children->parent = node_parent;
 							//delete node
 							delete node;
+							--_size;
 							//balance
 							if (node_color == _FT_RB_TREE_BLACK)
 							{
@@ -463,9 +464,15 @@ namespace __ft
 						}
 					}
 				}
-				void	erase(_Key key)
+				size_type	erase(_Key key)
 				{
-					this->erase(search(key));
+					_RBnode	*node = search(key);
+					if (node != NULL)
+					{
+						this->erase(node);
+						return (1);
+					}
+					return (0);
 				}
 				void	insert(_RBnode *new_node)
 				{
@@ -561,13 +568,11 @@ namespace __ft
 				value_type& operator[](const _Key& key)
 				{
 					_RBnode	*node;
-					_RBnode	*p = NULL;
 
 					node = this->root;
 					while (node && (_compare(node->value->first, key)
 								|| _compare(key, node->value->first)))
 					{
-						p = node;
 						if (_compare(node->value->first, key))
 							node = node->left;
 						else
@@ -575,22 +580,16 @@ namespace __ft
 					}
 					if (node != NULL)
 						return (*(node->value));
-					
-					_Val	test;
-					_Val	new_val(key, test.second);
-					_RBnode	*new_node;
-					
-					new_node = new _RBnode(new_val);
-					if (p == NULL)
-						this->root = new_node;
-					else if (_compare(p->value->first, key))
-						p->left = new_node;
 					else
-						p->right = new_node;
-					++_size;
-					return (*(new_node->value));
+					{
+						_Val	test;
+						_Val	new_val(key, test.second);
+
+						insert(new_val);
+						return (*(search(key)->value));
+					}
 				}
-				
+
 				_RBnode		*root;
 			private:
 				_Compare	_compare;
@@ -697,7 +696,12 @@ namespace ft
 				reverse_iterator rend();
 				const_reverse_iterator rend() const;
 				// capacity:
-				bool empty() const;
+				bool empty() const
+				{
+					if (this->_binary_tree.size() == 0)
+						return (true);
+					return (false);
+				}
 				size_type size() const
 				{
 					return (this->_binary_tree.size());
@@ -717,7 +721,10 @@ namespace ft
 				template <class InputIterator>
 					void insert(InputIterator first, InputIterator last);
 				void erase(iterator position);
-				size_type erase(const key_type& x);
+				size_type erase(const key_type& x)
+				{
+					return (this->_binary_tree.erase(x));
+				}
 				void erase(iterator first, iterator last);
 				void swap(map<Key,T,Compare,Allocator>&);
 				void clear();
