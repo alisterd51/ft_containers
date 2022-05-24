@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/24 16:52:09 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/24 18:13:58 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,6 +214,12 @@ namespace __ft
 				~RBtree()
 				{
 					recursive_remove(this->root);
+				}
+				void	clear()
+				{
+					recursive_remove(this->root);
+					this->root = NULL;
+					this->_size = 0;
 				}
 				RBtree&	operator=(const RBtree& x)
 				{
@@ -589,6 +595,16 @@ namespace __ft
 						return (*(search(key)->value));
 					}
 				}
+				void swap(RBtree &x)
+				{
+					_RBnode		*tmp_root = this->root;
+					size_type	tmp_size = this->_size;
+
+					this->root = x.root;
+					this->_size = x._size;
+					x.root = tmp_root;
+					x._size = tmp_size;
+				}
 
 				_RBnode		*root;
 			private:
@@ -726,8 +742,14 @@ namespace ft
 					return (this->_binary_tree.erase(x));
 				}
 				void erase(iterator first, iterator last);
-				void swap(map<Key,T,Compare,Allocator>&);
-				void clear();
+				void swap(map<Key,T,Compare,Allocator> &x)
+				{
+					this->_binary_tree.swap(x._binary_tree);
+				}
+				void clear()
+				{
+					_binary_tree.clear();
+				}
 				// observers:
 				key_compare key_comp() const;
 				value_compare value_comp() const;
@@ -765,7 +787,10 @@ namespace ft
 	// specialized algorithms:
 	template <class Key, class T, class Compare, class Allocator>
 		void swap(map<Key,T,Compare,Allocator>& x,
-				map<Key,T,Compare,Allocator>& y);
+				map<Key,T,Compare,Allocator>& y)
+		{
+			x.swap(y);
+		}
 }
 
 /*namespace ft
