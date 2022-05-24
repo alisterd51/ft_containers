@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/24 01:24:30 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/24 04:00:54 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,6 +194,7 @@ namespace __ft
 					{
 					};
 				typedef	__ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc>	_RBnode;
+				typedef	std::allocator<_RBnode>					_Alloc_node;
 			public:
 				typedef _Val									value_type;
 				typedef	Rbtree_iterator<value_type>				iterator;
@@ -205,7 +206,9 @@ namespace __ft
 
 				RBtree() :
 					root(NULL),
-					_compare(_Compare())
+					_compare(_Compare()),
+					_alloc_node(_Alloc_node()),
+					_size(0)
 			{
 			}
 				~RBtree()
@@ -221,6 +224,7 @@ namespace __ft
 							this->root = x.root->recursive_copy(NULL);
 						else
 							this->root = NULL;
+						this->_size = x._size;
 					}
 					return (*this);
 				}
@@ -469,6 +473,7 @@ namespace __ft
 						this->root = new_node;
 					else
 						this->root->insert(new_node);
+					++_size;
 				}
 				void	insert(_Val value)
 				{
@@ -545,10 +550,52 @@ namespace __ft
 				{
 					_print(this->root);
 				}
+				size_type size() const
+				{
+					return (_size);
+				}
+				size_type max_size() const
+				{
+					return (_alloc_node.max_size());
+				}
+				value_type& operator[](const _Key& key)
+				{
+					_RBnode	*node;
+					_RBnode	*p = NULL;
+
+					node = this->root;
+					while (node && (_compare(node->value->first, key)
+								|| _compare(key, node->value->first)))
+					{
+						p = node;
+						if (_compare(node->value->first, key))
+							node = node->left;
+						else
+							node = node->right;
+					}
+					if (node != NULL)
+						return (*(node->value));
+					
+					_Val	test;
+					_Val	new_val(key, test.second);
+					_RBnode	*new_node;
+					
+					new_node = new _RBnode(new_val);
+					if (p == NULL)
+						this->root = new_node;
+					else if (_compare(p->value->first, key))
+						p->left = new_node;
+					else
+						p->right = new_node;
+					++_size;
+					return (*(new_node->value));
+				}
 				
 				_RBnode		*root;
 			private:
 				_Compare	_compare;
+				_Alloc_node	_alloc_node;
+				size_type	_size;
 		};
 }
 
@@ -597,15 +644,13 @@ namespace ft
 				Compare		_compare;
 				Allocator	_allocator;
 				_Rep_type	_binary_tree;
-				size_type	_size;
 			public:
 				// 23.3.1.1 construct/copy/destroy:
 				explicit map(const Compare& comp = Compare(),
 						const Allocator& = Allocator()) :
 					_compare(comp),
 					_allocator(Allocator()),
-					_binary_tree(),
-					_size(0)
+					_binary_tree()
 			{
 			}
 				template <class InputIterator>
@@ -614,10 +659,9 @@ namespace ft
 							const Allocator& = Allocator()) :
 						_compare(comp),
 						_allocator(Allocator()),
-						_binary_tree(),
-						_size(0)
+						_binary_tree()
 			{
-				for (; first != last; ++first, ++_size)
+				for (; first != last; ++first)
 				{
 					_binary_tree.insert(*first);
 				}
@@ -640,7 +684,6 @@ namespace ft
 							this->_compare = x._compare;
 							this->_allocator = x._allocator;
 							this->_binary_tree = x._binary_tree;
-							this->_size = x._size;
 						}
 						return (*this);
 					}
@@ -657,11 +700,17 @@ namespace ft
 				bool empty() const;
 				size_type size() const
 				{
-					return (_size);
+					return (this->_binary_tree.size());
 				}
-				size_type max_size() const;
+				size_type max_size() const
+				{
+					return (this->_binary_tree.max_size());
+				}
 				// 23.3.1.2 element access:
-				T& operator[](const key_type& x);
+				T& operator[](const key_type& x)
+				{
+					return (_binary_tree[x].second);
+				}
 				// modifiers:
 				std::pair<iterator, bool> insert(const value_type& x);
 				iterator insert(iterator position, const value_type& x);
