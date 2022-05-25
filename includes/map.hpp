@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/25 13:26:54 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/25 17:16:31 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,10 +189,22 @@ namespace __ft
 				template<typename _Tp>
 					class Rbtree_iterator
 					{
+						public:
+							typedef std::bidirectional_iterator_tag	iterator_category;
+							typedef _Tp								value_type;
+							typedef std::ptrdiff_t					difference_type;
+							typedef _Tp*							pointer;
+							typedef _Tp&							reference;
 					};
 				template<typename _Tp>
 					class Rbtree_const_iterator
 					{
+						public:
+							typedef std::bidirectional_iterator_tag	iterator_category;
+							typedef _Tp								value_type;
+							typedef std::ptrdiff_t					difference_type;
+							typedef _Tp*							pointer;
+							typedef _Tp&							reference;
 					};
 				typedef	__ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc>	_RBnode;
 				typedef	std::allocator<_RBnode>					_Alloc_node;
@@ -639,8 +651,8 @@ namespace ft
 				typedef typename _Rep_type::difference_type		difference_type;
 				typedef typename Allocator::pointer				pointer;
 				typedef typename Allocator::const_pointer		const_pointer;
-				typedef std::reverse_iterator<iterator>			reverse_iterator;
-				typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
+				typedef ft::reverse_iterator<iterator>			reverse_iterator;
+				typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 				class value_compare
 					: public std::binary_function<value_type,value_type,bool>
 				{
@@ -756,7 +768,10 @@ namespace ft
 				{
 					return (this->_compare);
 				}
-				value_compare value_comp() const;
+				value_compare value_comp() const
+				{
+					return (value_compare());
+				}
 				// 23.3.1.3 map operations:
 				iterator find(const key_type& x);
 				const_iterator find(const key_type& x) const;
@@ -769,6 +784,11 @@ namespace ft
 					equal_range(const key_type& x);
 				ft::pair<const_iterator,const_iterator>
 					equal_range(const key_type& x) const;
+				// allocator:
+				allocator_type get_allocator() const
+				{
+					return (allocator_type());
+				}
 		};
 	template <class Key, class T, class Compare, class Allocator>
 		bool operator==(const map<Key,T,Compare,Allocator>& x,
