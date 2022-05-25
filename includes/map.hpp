@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/25 17:16:31 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/25 21:59:15 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,10 @@ namespace __ft
 				template<typename _Tp>
 					class Rbtree_iterator
 					{
+						private:
+							typedef Rbtree_iterator<_Tp>			node_iterator;
+							typedef __ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc>*
+																	node_pointer;
 						public:
 							typedef std::bidirectional_iterator_tag	iterator_category;
 							typedef _Tp								value_type;
@@ -645,8 +649,11 @@ namespace ft
 			public:
 				typedef typename Allocator::reference			reference;
 				typedef typename Allocator::const_reference 	const_reference;
-				typedef typename _Rep_type::iterator			iterator;
-				typedef typename _Rep_type::const_iterator		const_iterator;
+				//replace by bidirect iterator
+				typedef	__ft::__normal_iterator<typename _Rep_type::iterator, map>
+																iterator;
+				typedef	__ft::__normal_iterator<typename _Rep_type::const_iterator, map>
+																const_iterator;
 				typedef typename _Rep_type::size_type			size_type;
 				typedef typename _Rep_type::difference_type		difference_type;
 				typedef typename Allocator::pointer				pointer;
@@ -716,14 +723,38 @@ namespace ft
 						return (*this);
 					}
 				// iterators:
-				iterator begin();
-				const_iterator begin() const;
-				iterator end();
-				const_iterator end() const;
-				reverse_iterator rbegin();
-				const_reverse_iterator rbegin() const;
-				reverse_iterator rend();
-				const_reverse_iterator rend() const;
+				iterator begin()
+				{
+					return (_binary_tree.begin());
+				}
+				const_iterator begin() const
+				{
+					return (_binary_tree.begin());
+				}
+				iterator end()
+				{
+					return (_binary_tree.end());
+				}
+				const_iterator end() const
+				{
+					return (_binary_tree.end());
+				}
+				reverse_iterator rbegin()
+				{
+					return (reverse_iterator(end()));
+				}
+				const_reverse_iterator rbegin() const
+				{
+					return (const_reverse_iterator(end()));
+				}
+				reverse_iterator rend()
+				{
+					return (reverse_iterator(begin()));
+				}
+				const_reverse_iterator rend() const
+				{
+					return (const_reverse_iterator(begin()));
+				}
 				// capacity:
 				bool empty() const
 				{
