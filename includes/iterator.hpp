@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/02 01:36:53 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/25 10:53:09 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,11 @@ namespace ft
 				Iter iter;
 			public:
 				typedef Iter													iterator_type;
-				typedef typename std::iterator_traits<Iter>::iterator_category	iterator_category;
-				typedef typename std::iterator_traits<Iter>::value_type			value_type;
-				typedef typename std::iterator_traits<Iter>::difference_type	difference_type;
-				typedef typename std::iterator_traits<Iter>::pointer			pointer;
-				typedef typename std::iterator_traits<Iter>::reference			reference;
+				typedef typename ft::iterator_traits<Iter>::iterator_category	iterator_category;
+				typedef typename ft::iterator_traits<Iter>::value_type			value_type;
+				typedef typename ft::iterator_traits<Iter>::difference_type		difference_type;
+				typedef typename ft::iterator_traits<Iter>::pointer				pointer;
+				typedef typename ft::iterator_traits<Iter>::reference			reference;
 
 				//constructor
 				reverse_iterator() :
