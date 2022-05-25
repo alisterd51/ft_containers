@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:21:42 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/03 13:34:59 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/25 18:43:11 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,16 @@ namespace ft
 	template <class T, class Container = ft::vector<T> >
 		class stack
 		{
+			private:
+				//friend use to unlock access to protected objects in
+				//non member functions
+				template<typename _T1, typename _C1>
+					friend bool
+					operator==(const stack<_T1, _C1>&, const stack<_T1, _C1>&);
+
+				template<typename _T1, typename _C1>
+					friend bool
+					operator<(const stack<_T1, _C1>&, const stack<_T1, _C1>&);
 			public:
 				//member type
 				typedef typename Container::value_type	value_type;
@@ -35,8 +45,8 @@ namespace ft
 				// Same as the corresponding operation on the wrapped container
 				explicit stack(const Container& cont = Container()) :
 					c(cont)
-				{
-				}
+			{
+			}
 				//destructor
 				//operator=
 				//capacity
@@ -78,11 +88,6 @@ namespace ft
 				{
 					c.pop_back();
 				}
-				//getter
-				Container	_getC() const
-				{
-					return (c);
-				}
 		};
 	//non-member functions
 	//Complexity:
@@ -91,7 +96,7 @@ namespace ft
 		bool operator==(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x._getC() == y._getC());
+			return (x.c == y.c);
 		}
 	//Complexity:
 	// Linear in the size of the container
@@ -99,7 +104,7 @@ namespace ft
 		bool operator< (const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x._getC() < y._getC());
+			return (x.c < y.c);
 		}
 	//Complexity:
 	// Linear in the size of the container
@@ -107,7 +112,7 @@ namespace ft
 		bool operator!=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x._getC() != y._getC());
+			return (!(x == y));
 		}
 	//Complexity:
 	// Linear in the size of the container
@@ -115,7 +120,7 @@ namespace ft
 		bool operator> (const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x._getC() > y._getC());
+			return (!(x <= y));
 		}
 	//Complexity:
 	// Linear in the size of the container
@@ -123,7 +128,7 @@ namespace ft
 		bool operator>=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x._getC() >= y._getC());
+			return (!(x < y));
 		}
 	//Complexity:
 	// Linear in the size of the container
@@ -131,7 +136,7 @@ namespace ft
 		bool operator<=(const stack<T, Container>& x,
 				const stack<T, Container>& y)
 		{
-			return (x._getC() <= y._getC());
+			return (x < y || x == y);
 		}
 }
 
