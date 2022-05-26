@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/26 18:27:02 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/26 22:23:59 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,30 +82,74 @@ namespace __ft
 					return (NULL);
 				return (this->parent->brother());
 			}
+			RBnode  *max()
+			{
+					RBnode	*max = this;
+
+					while (max && max->right)
+						max = max->right;
+					return (max);
+			}
+			RBnode  *min()
+			{
+					RBnode	*min = this;
+
+					while (min && min->left)
+						min = min->left;
+					return (min);
+			}
 			RBnode	*next()
 			{
-				RBnode	*n;
-				RBnode	*prev = NULL;
+				RBnode	*n = this;
 
-				n = this;
-				while (n && n->value->first <= this->value->first)//
+				if (n->right)
 				{
-
-					//right && diff de prev
-					//parent
-					if (n->right && n->right != prev)
-					{
-						prev = n;
-						n = n->right;
-					}
-					else
-					{
-						prev = n;
-						n = n->parent;
-					}
+					n = n->right;
+					while (n->left)
+						n = n->left;
 				}
-				while (n && n->left && n->left->value->first > this->value->first)
+				else if (n->parent && n->parent->left)
+				{
+					n = n->parent;
+				}
+				else if (n->parent && n->parent->right)
+				{
+					while (n->parent && n->parent->right)
+						n = n->parent;
+					if (n->parent)
+						n = n->parent;
+					else
+						n = NULL;
+				}
+				else
+					n = NULL;
+				return (n);
+			}
+			RBnode	*prev()
+			{
+				RBnode	*n = this;
+
+				if (n->left)
+				{
 					n = n->left;
+					while (n->right)
+						n = n->right;
+				}
+				else if (n->parent && n->parent->right)
+				{
+					n = n->parent;
+				}
+				else if (n->parent && n->parent->left)
+				{
+					while (n->parent && n->parent->left)
+						n = n->parent;
+					if (n->parent)
+						n = n->parent;
+					else
+						n = NULL;
+				}
+				else
+					n = NULL;
 				return (n);
 			}
 			RBnode	*recursive_copy(RBnode *p)
@@ -221,22 +265,32 @@ namespace __ft
 				typedef _Tp&							reference;
 			private:
 				node_pointer	_node;
+				node_pointer	_root;
+				node_pointer	_parent;
 
 				template<typename _Tp1, typename _RBnode1>
 					friend bool	operator==(const Rbtree_iterator<_Tp1, _RBnode1>&,
 							const Rbtree_iterator<_Tp1, _RBnode1>&);
 			public:
 				Rbtree_iterator() :
-					_node()
+					_node(),
+					_root(),
+					_parent()
 			{
 			}
 				Rbtree_iterator(const Rbtree_iterator& x) :
-					_node()
+					_node(),
+					_root(),
+					_parent()
 			{
 				*this = x;
 			}
-				Rbtree_iterator(const node_pointer& node) :
-					_node(node)
+				Rbtree_iterator(const node_pointer& node,
+						const node_pointer& root,
+						const node_pointer& parent = NULL) :
+					_node(node),
+					_root(root),
+					_parent(parent)
 			{
 			}
 				Rbtree_iterator	&operator=(const Rbtree_iterator& x)
@@ -244,32 +298,73 @@ namespace __ft
 					if (this != &x)
 					{
 						this->_node = x._node;
+						this->_root = x._root;
+						this->_parent = x._parent;
 					}
 					return (*this);
 				}
 				Rbtree_iterator&
 					operator++()
 					{
-						if (_node)
+						if (_node && _node == _root->max())
+						{
+							_parent = _root->max();
+							_node = NULL;
+						}
+						else if (_node)
+						{
+							_parent = NULL;
 							_node = _node->next();
+						}
+						else if (_parent && _parent == _root->min())
+						{
+							_parent = NULL;
+							_node = _root->min();
+						}
 						return (*this);
 					}
-
 				Rbtree_iterator
 					operator++(int)
 					{
-						_RBnode	*prev_node = _node;
+						Rbtree_iterator	temp = *this;
 
-						if (_node)
-							_node = _node.next();
-						return (Rbtree_iterator(_node));
+						++(*this);
+						return (temp);
+					}
+				Rbtree_iterator&
+					operator--()
+					{
+						if (_node && _node == _root->min())
+						{
+							_parent = _root->min();
+							_node = NULL;
+						}
+						else if (_node)
+						{
+							_parent = NULL;
+							_node = _node->prev();
+						}
+						else if (_parent && _parent == _root->max())
+						{
+							_parent = NULL;
+							_node = _root->max();
+						}
+						return (*this);
+					}
+				Rbtree_iterator
+					operator--(int)
+					{
+						Rbtree_iterator	temp = *this;
+
+						--(*this);
+						return (temp);
 					}
 		};
 	template<typename _Tp, typename _RBnode>
 		bool	operator==(const Rbtree_iterator<_Tp, _RBnode>& lhs,
 				const Rbtree_iterator<_Tp, _RBnode>& rhs)
 		{
-			return (lhs._node == rhs._node);
+			return (lhs._node == rhs._node && lhs._parent == rhs._parent);
 		}
 	template<typename _Tp, typename _RBnode>
 		bool	operator!=(const Rbtree_iterator<_Tp, _RBnode>& lhs,
@@ -336,27 +431,23 @@ namespace __ft
 				}
 				_RBnode	*min()
 				{
-					_RBnode	*min = root;
-
-					while (min && min->left)
-						min = min->left;
-					return (min);
+					if (root)
+						return (root->min());
+					return (root);
 				}
 				_RBnode	*max()
 				{
-					_RBnode	*max = root;
-
-					while (max && max->left)
-						max = max->right;
-					return (max);
+					if (root)
+						return (root->max());
+					return (root);
 				}
 				iterator	begin()
 				{
-					return (iterator(min()));
+					return (iterator(min(), root));
 				}
 				iterator	end()
 				{
-					return (++iterator(max()));
+					return (++iterator(max(), root));
 				}
 				void	recursive_remove(_RBnode *node)
 				{
