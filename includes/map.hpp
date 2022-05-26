@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/26 17:40:15 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/26 18:27:02 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,6 +221,10 @@ namespace __ft
 				typedef _Tp&							reference;
 			private:
 				node_pointer	_node;
+
+				template<typename _Tp1, typename _RBnode1>
+					friend bool	operator==(const Rbtree_iterator<_Tp1, _RBnode1>&,
+							const Rbtree_iterator<_Tp1, _RBnode1>&);
 			public:
 				Rbtree_iterator() :
 					_node()
@@ -261,6 +265,18 @@ namespace __ft
 						return (Rbtree_iterator(_node));
 					}
 		};
+	template<typename _Tp, typename _RBnode>
+		bool	operator==(const Rbtree_iterator<_Tp, _RBnode>& lhs,
+				const Rbtree_iterator<_Tp, _RBnode>& rhs)
+		{
+			return (lhs._node == rhs._node);
+		}
+	template<typename _Tp, typename _RBnode>
+		bool	operator!=(const Rbtree_iterator<_Tp, _RBnode>& lhs,
+				const Rbtree_iterator<_Tp, _RBnode>& rhs)
+		{
+			return (!(lhs == rhs));
+		}
 
 	template<typename _Tp, typename _RBnode>
 		class Rbtree_const_iterator
