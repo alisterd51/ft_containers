@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/25 21:59:15 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/26 17:40:15 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,32 @@ namespace __ft
 				if (this->grandparent() == NULL)
 					return (NULL);
 				return (this->parent->brother());
+			}
+			RBnode	*next()
+			{
+				RBnode	*n;
+				RBnode	*prev = NULL;
+
+				n = this;
+				while (n && n->value->first <= this->value->first)//
+				{
+
+					//right && diff de prev
+					//parent
+					if (n->right && n->right != prev)
+					{
+						prev = n;
+						n = n->right;
+					}
+					else
+					{
+						prev = n;
+						n = n->parent;
+					}
+				}
+				while (n && n->left && n->left->value->first > this->value->first)
+					n = n->left;
+				return (n);
 			}
 			RBnode	*recursive_copy(RBnode *p)
 			{
@@ -182,40 +208,81 @@ namespace __ft
 			return (o);
 		}
 
+	template<typename _Tp, typename _RBnode>
+		class Rbtree_iterator
+		{
+			private:
+				typedef _RBnode*						node_pointer;
+			public:
+				typedef std::bidirectional_iterator_tag	iterator_category;
+				typedef _Tp								value_type;
+				typedef std::ptrdiff_t					difference_type;
+				typedef _Tp*							pointer;
+				typedef _Tp&							reference;
+			private:
+				node_pointer	_node;
+			public:
+				Rbtree_iterator() :
+					_node()
+			{
+			}
+				Rbtree_iterator(const Rbtree_iterator& x) :
+					_node()
+			{
+				*this = x;
+			}
+				Rbtree_iterator(const node_pointer& node) :
+					_node(node)
+			{
+			}
+				Rbtree_iterator	&operator=(const Rbtree_iterator& x)
+				{
+					if (this != &x)
+					{
+						this->_node = x._node;
+					}
+					return (*this);
+				}
+				Rbtree_iterator&
+					operator++()
+					{
+						if (_node)
+							_node = _node->next();
+						return (*this);
+					}
+
+				Rbtree_iterator
+					operator++(int)
+					{
+						_RBnode	*prev_node = _node;
+
+						if (_node)
+							_node = _node.next();
+						return (Rbtree_iterator(_node));
+					}
+		};
+
+	template<typename _Tp, typename _RBnode>
+		class Rbtree_const_iterator
+		{
+			public:
+				typedef std::bidirectional_iterator_tag	iterator_category;
+				typedef _Tp								value_type;
+				typedef std::ptrdiff_t					difference_type;
+				typedef _Tp*							pointer;
+				typedef _Tp&							reference;
+		};
+
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
 		struct RBtree
 		{
 			private:
-				template<typename _Tp>
-					class Rbtree_iterator
-					{
-						private:
-							typedef Rbtree_iterator<_Tp>			node_iterator;
-							typedef __ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc>*
-																	node_pointer;
-						public:
-							typedef std::bidirectional_iterator_tag	iterator_category;
-							typedef _Tp								value_type;
-							typedef std::ptrdiff_t					difference_type;
-							typedef _Tp*							pointer;
-							typedef _Tp&							reference;
-					};
-				template<typename _Tp>
-					class Rbtree_const_iterator
-					{
-						public:
-							typedef std::bidirectional_iterator_tag	iterator_category;
-							typedef _Tp								value_type;
-							typedef std::ptrdiff_t					difference_type;
-							typedef _Tp*							pointer;
-							typedef _Tp&							reference;
-					};
 				typedef	__ft::RBnode<_Key, _Val, _KeyOfValue, _Compare, _Alloc>	_RBnode;
 				typedef	std::allocator<_RBnode>					_Alloc_node;
 			public:
 				typedef _Val									value_type;
-				typedef	Rbtree_iterator<value_type>				iterator;
-				typedef	Rbtree_const_iterator<value_type>		const_iterator;
+				typedef	Rbtree_iterator<value_type, _RBnode>	iterator;
+				typedef	Rbtree_const_iterator<value_type, _RBnode>	const_iterator;
 				typedef	ft::reverse_iterator<iterator>			reverse_iterator;
 				typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 				typedef std::size_t								size_type;
@@ -250,6 +317,30 @@ namespace __ft
 						this->_size = x._size;
 					}
 					return (*this);
+				}
+				_RBnode	*min()
+				{
+					_RBnode	*min = root;
+
+					while (min && min->left)
+						min = min->left;
+					return (min);
+				}
+				_RBnode	*max()
+				{
+					_RBnode	*max = root;
+
+					while (max && max->left)
+						max = max->right;
+					return (max);
+				}
+				iterator	begin()
+				{
+					return (iterator(min()));
+				}
+				iterator	end()
+				{
+					return (++iterator(max()));
 				}
 				void	recursive_remove(_RBnode *node)
 				{
@@ -650,10 +741,10 @@ namespace ft
 				typedef typename Allocator::reference			reference;
 				typedef typename Allocator::const_reference 	const_reference;
 				//replace by bidirect iterator
-				typedef	__ft::__normal_iterator<typename _Rep_type::iterator, map>
-																iterator;
+				typedef	__ft::__bidirectional_iterator<typename _Rep_type::iterator, map>
+					iterator;
 				typedef	__ft::__normal_iterator<typename _Rep_type::const_iterator, map>
-																const_iterator;
+					const_iterator;
 				typedef typename _Rep_type::size_type			size_type;
 				typedef typename _Rep_type::difference_type		difference_type;
 				typedef typename Allocator::pointer				pointer;
@@ -725,19 +816,19 @@ namespace ft
 				// iterators:
 				iterator begin()
 				{
-					return (_binary_tree.begin());
+					return (iterator(_binary_tree.begin()));
 				}
 				const_iterator begin() const
 				{
-					return (_binary_tree.begin());
+					return (iterator(_binary_tree.begin()));
 				}
 				iterator end()
 				{
-					return (_binary_tree.end());
+					return (iterator(_binary_tree.end()));
 				}
 				const_iterator end() const
 				{
-					return (_binary_tree.end());
+					return (iterator(_binary_tree.end()));
 				}
 				reverse_iterator rbegin()
 				{
