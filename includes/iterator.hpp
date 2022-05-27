@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/26 12:08:12 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/27 11:22:10 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,7 +305,7 @@ namespace __ft
 				pointer
 					operator->() const
 					{
-						return (_M_current);
+						return (&(*_M_current));
 					}
 
 				__bidirectional_iterator&
@@ -424,7 +424,7 @@ namespace __ft
 				pointer
 					operator->() const
 					{
-						return (_M_current);
+						return (&(*_M_current));
 					}
 
 				__normal_iterator&

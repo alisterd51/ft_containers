@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/26 22:23:59 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/27 11:26:55 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,15 +35,17 @@ namespace __ft
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
 		struct RBnode
 		{
+			typedef _Val	value_type;
+
 			RBnode		*parent;
 			RBnode		*left;
 			RBnode		*right;
 			int			color;
-			_Val		*value;
+			value_type	*value;
 			_Alloc		_allocator;
 			_Compare	_compare;
 
-			RBnode(_Val newValue) :
+			RBnode(value_type newValue) :
 				parent(_FT_RB_TREE_LEAF),
 				left(_FT_RB_TREE_LEAF),
 				right(_FT_RB_TREE_LEAF),
@@ -252,25 +254,25 @@ namespace __ft
 			return (o);
 		}
 
-	template<typename _Tp, typename _RBnode>
+	template<typename _RBnode>
 		class Rbtree_iterator
 		{
 			private:
 				typedef _RBnode*						node_pointer;
 			public:
 				typedef std::bidirectional_iterator_tag	iterator_category;
-				typedef _Tp								value_type;
+				typedef typename _RBnode::value_type	value_type;
 				typedef std::ptrdiff_t					difference_type;
-				typedef _Tp*							pointer;
-				typedef _Tp&							reference;
+				typedef value_type*						pointer;
+				typedef value_type&						reference;
 			private:
 				node_pointer	_node;
 				node_pointer	_root;
 				node_pointer	_parent;
 
-				template<typename _Tp1, typename _RBnode1>
-					friend bool	operator==(const Rbtree_iterator<_Tp1, _RBnode1>&,
-							const Rbtree_iterator<_Tp1, _RBnode1>&);
+				template<typename _RBnode1>
+					friend bool	operator==(const Rbtree_iterator<_RBnode1>&,
+							const Rbtree_iterator<_RBnode1>&);
 			public:
 				Rbtree_iterator() :
 					_node(),
@@ -359,29 +361,37 @@ namespace __ft
 						--(*this);
 						return (temp);
 					}
+				reference operator*()
+				{
+					return (*(_node->value));
+				}
+				const reference operator*() const
+				{
+					return (*(_node->value));
+				}
 		};
-	template<typename _Tp, typename _RBnode>
-		bool	operator==(const Rbtree_iterator<_Tp, _RBnode>& lhs,
-				const Rbtree_iterator<_Tp, _RBnode>& rhs)
+	template<typename _RBnode>
+		bool	operator==(const Rbtree_iterator<_RBnode>& lhs,
+				const Rbtree_iterator<_RBnode>& rhs)
 		{
 			return (lhs._node == rhs._node && lhs._parent == rhs._parent);
 		}
-	template<typename _Tp, typename _RBnode>
-		bool	operator!=(const Rbtree_iterator<_Tp, _RBnode>& lhs,
-				const Rbtree_iterator<_Tp, _RBnode>& rhs)
+	template<typename _RBnode>
+		bool	operator!=(const Rbtree_iterator<_RBnode>& lhs,
+				const Rbtree_iterator<_RBnode>& rhs)
 		{
 			return (!(lhs == rhs));
 		}
 
-	template<typename _Tp, typename _RBnode>
+	template<typename _RBnode>
 		class Rbtree_const_iterator
 		{
 			public:
 				typedef std::bidirectional_iterator_tag	iterator_category;
-				typedef _Tp								value_type;
+				typedef typename _RBnode::value_type	value_type;
 				typedef std::ptrdiff_t					difference_type;
-				typedef _Tp*							pointer;
-				typedef _Tp&							reference;
+				typedef value_type*						pointer;
+				typedef value_type&						reference;
 		};
 
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
@@ -392,8 +402,8 @@ namespace __ft
 				typedef	std::allocator<_RBnode>					_Alloc_node;
 			public:
 				typedef _Val									value_type;
-				typedef	Rbtree_iterator<value_type, _RBnode>	iterator;
-				typedef	Rbtree_const_iterator<value_type, _RBnode>	const_iterator;
+				typedef	Rbtree_iterator<_RBnode>				iterator;
+				typedef	Rbtree_const_iterator<_RBnode>			const_iterator;
 				typedef	ft::reverse_iterator<iterator>			reverse_iterator;
 				typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 				typedef std::size_t								size_type;
@@ -516,7 +526,7 @@ namespace __ft
 					while (node && (_compare(node->value->first, key)
 								|| _compare(key, node->value->first)))
 					{
-						if (_compare(node->value->first, key))
+						if (_compare(node->value->first, key))//////////////////
 							node = node->left;
 						else
 							node = node->right;
@@ -794,7 +804,7 @@ namespace __ft
 					while (node && (_compare(node->value->first, key)
 								|| _compare(key, node->value->first)))
 					{
-						if (_compare(node->value->first, key))
+						if (_compare(node->value->first, key))//////////////////
 							node = node->left;
 						else
 							node = node->right;
