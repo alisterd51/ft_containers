@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/27 11:26:55 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/27 12:44:32 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ namespace __ft
 			}
 			void	insert(RBnode *new_node)
 			{
-				if (_compare(this->value->first, new_node->value->first))
+				if (_compare(new_node->value->first, this->value->first))
 				{
 					if (this->left != NULL)
 						this->left->insert(new_node);
@@ -365,7 +365,7 @@ namespace __ft
 				{
 					return (*(_node->value));
 				}
-				const reference operator*() const
+				reference operator*() const
 				{
 					return (*(_node->value));
 				}
@@ -526,7 +526,7 @@ namespace __ft
 					while (node && (_compare(node->value->first, key)
 								|| _compare(key, node->value->first)))
 					{
-						if (_compare(node->value->first, key))//////////////////
+						if (_compare(key, node->value->first))//////////////////
 							node = node->left;
 						else
 							node = node->right;
@@ -590,7 +590,8 @@ namespace __ft
 							else
 								right_rotation(db_parent);
 							db_brother->color = db_parent->color;
-							db_node->color = _FT_RB_TREE_BLACK;
+							if (db_node)
+								db_node->color = _FT_RB_TREE_BLACK;
 							db_parent->color = _FT_RB_TREE_BLACK;
 							db_furthest_nephew->color = _FT_RB_TREE_BLACK;
 						}
@@ -804,7 +805,7 @@ namespace __ft
 					while (node && (_compare(node->value->first, key)
 								|| _compare(key, node->value->first)))
 					{
-						if (_compare(node->value->first, key))//////////////////
+						if (_compare(key, node->value->first))//////////////////
 							node = node->left;
 						else
 							node = node->right;
@@ -933,6 +934,9 @@ namespace ft
 				// iterators:
 				iterator begin()
 				{
+					_binary_tree.print();
+					if (_binary_tree.min())
+						std::cout << *_binary_tree.min() << std::endl;
 					return (iterator(_binary_tree.begin()));
 				}
 				const_iterator begin() const

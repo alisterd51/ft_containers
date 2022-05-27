@@ -6,7 +6,7 @@
 #    By: anclarma <anclarma@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/13 03:39:54 by anclarma          #+#    #+#              #
-#    Updated: 2022/05/17 16:36:28 by anclarma         ###   ########.fr        #
+#    Updated: 2022/05/27 12:39:12 by anclarma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ project(ft_containers)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED 11)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic -Weffc++")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic -Weffc++ -fsanitize=address -g3")
 
 include(FetchContent)
 FetchContent_Declare(
