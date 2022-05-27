@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/27 12:44:32 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/27 15:10:20 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -934,9 +934,6 @@ namespace ft
 				// iterators:
 				iterator begin()
 				{
-					_binary_tree.print();
-					if (_binary_tree.min())
-						std::cout << *_binary_tree.min() << std::endl;
 					return (iterator(_binary_tree.begin()));
 				}
 				const_iterator begin() const
@@ -992,7 +989,10 @@ namespace ft
 				iterator insert(iterator position, const value_type& x);
 				template <class InputIterator>
 					void insert(InputIterator first, InputIterator last);
-				void erase(iterator position);
+				void erase(iterator position)
+				{
+					erase(position->first);
+				}
 				size_type erase(const key_type& x)
 				{
 					return (this->_binary_tree.erase(x));
