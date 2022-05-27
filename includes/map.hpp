@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/27 15:10:20 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/27 16:45:21 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -439,13 +439,13 @@ namespace __ft
 					}
 					return (*this);
 				}
-				_RBnode	*min()
+				_RBnode	*min() const
 				{
 					if (root)
 						return (root->min());
 					return (root);
 				}
-				_RBnode	*max()
+				_RBnode	*max() const
 				{
 					if (root)
 						return (root->max());
@@ -518,7 +518,7 @@ namespace __ft
 						this->root = S;
 					return (S);
 				}
-				_RBnode	*search(_Key key)
+				_RBnode	*search(_Key key) const
 				{
 					_RBnode	*node;
 
@@ -526,12 +526,16 @@ namespace __ft
 					while (node && (_compare(node->value->first, key)
 								|| _compare(key, node->value->first)))
 					{
-						if (_compare(key, node->value->first))//////////////////
+						if (_compare(key, node->value->first))
 							node = node->left;
 						else
 							node = node->right;
 					}
 					return (node);
+				}
+				iterator find(_Key x)
+				{
+					return (iterator(search(x), root));
 				}
 				void	balancing_double_black(_RBnode *db_node, _RBnode *db_parent)
 				{
@@ -1016,9 +1020,18 @@ namespace ft
 					return (value_compare());
 				}
 				// 23.3.1.3 map operations:
-				iterator find(const key_type& x);
+				iterator find(const key_type& x)
+				{
+					return (iterator(_binary_tree.find(x)));
+				}
 				const_iterator find(const key_type& x) const;
-				size_type count(const key_type& x) const;
+				size_type count(const key_type& x) const
+				{
+					if (_binary_tree.search(x))
+						return (1);
+					else
+						return (0);
+				}
 				iterator lower_bound(const key_type& x);
 				const_iterator lower_bound(const key_type& x) const;
 				iterator upper_bound(const key_type& x);
