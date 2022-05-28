@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/28 04:49:03 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/28 05:39:44 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -309,8 +309,7 @@ namespace __ft
 					}
 					return (*this);
 				}
-				Rbtree_iterator&
-					operator++()
+				Rbtree_iterator&	operator++()
 					{
 						if (_node && _node == _root->max())
 						{
@@ -329,16 +328,14 @@ namespace __ft
 						}
 						return (*this);
 					}
-				Rbtree_iterator
-					operator++(int)
+				Rbtree_iterator	operator++(int)
 					{
 						Rbtree_iterator	temp = *this;
 
 						++(*this);
 						return (temp);
 					}
-				Rbtree_iterator&
-					operator--()
+				Rbtree_iterator&	operator--()
 					{
 						if (_node && _node == _root->min())
 						{
@@ -357,8 +354,7 @@ namespace __ft
 						}
 						return (*this);
 					}
-				Rbtree_iterator
-					operator--(int)
+				Rbtree_iterator	operator--(int)
 					{
 						Rbtree_iterator	temp = *this;
 
@@ -388,13 +384,70 @@ namespace __ft
 	template<typename _RBnode>
 		class Rbtree_const_iterator
 		{
+			private:
+				typedef _RBnode*						node_pointer;
 			public:
 				typedef std::bidirectional_iterator_tag	iterator_category;
 				typedef typename _RBnode::value_type	value_type;
 				typedef std::ptrdiff_t					difference_type;
 				typedef value_type*						pointer;
 				typedef value_type&						reference;
+			private:
+				node_pointer	_node;
+				node_pointer	_root;
+				node_pointer	_parent;
+				value_type		_default_pair;
+
+				template<typename _RBnode1>
+					friend bool	operator==(const Rbtree_iterator<_RBnode1>&,
+							const Rbtree_iterator<_RBnode1>&);
+			public:
+				Rbtree_const_iterator() :
+					_node(),
+					_root(),
+					_parent(),
+					_default_pair()
+			{
+			}
+				Rbtree_const_iterator(const Rbtree_const_iterator& x) :
+					_node(),
+					_root(),
+					_parent(),
+					_default_pair()
+			{
+				*this = x;
+			}
+				Rbtree_const_iterator(const node_pointer& node,
+						const node_pointer& root,
+						const node_pointer& parent = NULL) :
+					_node(node),
+					_root(root),
+					_parent(parent),
+					_default_pair()
+			{
+			}
+				Rbtree_const_iterator	&operator=(const Rbtree_const_iterator& x)
+				{
+					if (this != &x)
+					{
+						this->_node = x._node;
+						this->_root = x._root;
+						this->_parent = x._parent;
+					}
+					return (*this);
+				}
+				Rbtree_const_iterator&	operator++();
+				Rbtree_const_iterator	operator++(int);
+				Rbtree_const_iterator&	operator--();
+				Rbtree_const_iterator	operator--(int);
+				reference operator*() const;
 		};
+	template<typename _RBnode>
+		bool	operator==(const Rbtree_const_iterator<_RBnode>& lhs,
+				const Rbtree_const_iterator<_RBnode>& rhs);
+	template<typename _RBnode>
+		bool	operator!=(const Rbtree_const_iterator<_RBnode>& lhs,
+				const Rbtree_const_iterator<_RBnode>& rhs);
 
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
 		struct RBtree
@@ -457,9 +510,17 @@ namespace __ft
 				{
 					return (iterator(min(), root));
 				}
+				const_iterator	begin() const
+				{
+					return (const_iterator(min(), root));
+				}
 				iterator	end()
 				{
 					return (++iterator(max(), root));
+				}
+				const_iterator	end() const
+				{
+					return (++const_iterator(max(), root));
 				}
 				void	recursive_remove(_RBnode *node)
 				{
@@ -975,7 +1036,7 @@ namespace ft
 				}
 				const_iterator begin() const
 				{
-					return (iterator(_binary_tree.begin()));
+					return (const_iterator(_binary_tree.begin()));
 				}
 				iterator end()
 				{
@@ -983,7 +1044,7 @@ namespace ft
 				}
 				const_iterator end() const
 				{
-					return (iterator(_binary_tree.end()));
+					return (const_iterator(_binary_tree.end()));
 				}
 				reverse_iterator rbegin()
 				{
