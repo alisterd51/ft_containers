@@ -10,9 +10,11 @@
 
 mkdir debug
 cd debug
-cmake ..
-cmake --build .
-./test1
-./test2
-./test3
-./stack_test
+CC=clang CXX=clang++ cmake ..
+if cmake --build .
+then
+	./test1
+	./test2
+	./test3
+	./stack_test
+fi

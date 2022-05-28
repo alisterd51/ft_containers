@@ -6,6 +6,7 @@ int	main()
 {
 	ft::map<char,int> mymap;
 	ft::map<char,int>::iterator it;
+	ft::map<char,int>::iterator ite;
 
 	// insert some values:
 	mymap['a']=10;
@@ -15,6 +16,10 @@ int	main()
 	mymap['e']=50;
 	mymap['f']=60;
 
+	std::cout << (mymap.insert(ft::make_pair<const char, int>('a', 21))).second << std::endl;
+	std::cout << (mymap.insert(ft::make_pair<const char, int>('z', 21))).second << std::endl;
+
+	mymap.insert(mymap.find('z'), ft::make_pair<const char, int>('z', 42));
 	it=mymap.find('b');
 	std::cout << "found b\n";
 	mymap.erase (it);                   // erasing by iterator
@@ -22,8 +27,9 @@ int	main()
 	mymap.erase ('c');                  // erasing by key
 	std::cout << "erase by key 'c'\n";
 	it=mymap.find ('e');
-	std::cout << "erase by range 'e' to end\n";
-	mymap.erase ( it, mymap.end() );    // erasing by range
+	ite=mymap.find ('z');
+	std::cout << "erase by range 'e' to 'y'\n";
+	mymap.erase ( it, ite );    // erasing by range
 
 	std::cout << " display :\n";
 	// show content:

@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/28 05:39:44 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/28 18:06:34 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -798,6 +798,7 @@ namespace __ft
 
 						while (node && node->value->first < max)
 						{
+							std::cout << node << std::endl;
 							n = node->next();
 							if (min <= node->value->first)
 								erase(node);
@@ -1083,10 +1084,36 @@ namespace ft
 					return (_binary_tree[x].second);
 				}
 				// modifiers:
-				ft::pair<iterator, bool> insert(const value_type& x);
-				iterator insert(iterator position, const value_type& x);
+				ft::pair<iterator, bool> insert(const value_type& x)
+				{
+
+					if (_binary_tree.search(x.first) != NULL)
+						return (ft::make_pair<iterator, bool>(find(x.first), false));
+					else
+					{
+						_binary_tree.insert(x);
+						return (ft::make_pair<iterator, bool>(find(x.first), true));
+					}
+				}
+				iterator insert(iterator position, const value_type& x)
+				{
+					if (position->first == x.first)
+					{
+						position->second = x.second;
+						return (position);
+					}
+					else
+					{
+						_binary_tree.insert(x);
+						return (find(x.first));
+					}
+				}
 				template <class InputIterator>
-					void insert(InputIterator first, InputIterator last);
+					void insert(InputIterator first, InputIterator last)
+					{
+						for (; first != last; ++first)
+							insert(*first);
+					}
 				void erase(iterator position)
 				{
 					erase(position->first);
