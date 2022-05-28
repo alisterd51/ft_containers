@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/27 16:45:21 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/28 04:49:03 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,6 +269,7 @@ namespace __ft
 				node_pointer	_node;
 				node_pointer	_root;
 				node_pointer	_parent;
+				value_type		_default_pair;
 
 				template<typename _RBnode1>
 					friend bool	operator==(const Rbtree_iterator<_RBnode1>&,
@@ -277,13 +278,15 @@ namespace __ft
 				Rbtree_iterator() :
 					_node(),
 					_root(),
-					_parent()
+					_parent(),
+					_default_pair()
 			{
 			}
 				Rbtree_iterator(const Rbtree_iterator& x) :
 					_node(),
 					_root(),
-					_parent()
+					_parent(),
+					_default_pair()
 			{
 				*this = x;
 			}
@@ -292,7 +295,8 @@ namespace __ft
 						const node_pointer& parent = NULL) :
 					_node(node),
 					_root(root),
-					_parent(parent)
+					_parent(parent),
+					_default_pair()
 			{
 			}
 				Rbtree_iterator	&operator=(const Rbtree_iterator& x)
@@ -361,13 +365,11 @@ namespace __ft
 						--(*this);
 						return (temp);
 					}
-				reference operator*()
-				{
-					return (*(_node->value));
-				}
 				reference operator*() const
 				{
-					return (*(_node->value));
+					if (_node)
+						return (*(_node->value));
+					return (reference(_default_pair));
 				}
 		};
 	template<typename _RBnode>
@@ -710,6 +712,38 @@ namespace __ft
 					}
 					return (0);
 				}
+				void	erase(iterator first, iterator last)
+				{
+					if (last == ++iterator(root->max(), root))
+					{
+						_Key	min((*first).first);
+						_RBnode	*node(search(min));
+						_RBnode	*n;
+
+						while (node)
+						{
+							n = node->next();
+							if (min <= node->value->first)
+								erase(node);
+							node = n;
+						}
+					}
+					else
+					{
+						_Key	min((*first).first);
+						_Key	max((*last).first);
+						_RBnode	*node(search(min));
+						_RBnode	*n;
+
+						while (node && node->value->first < max)
+						{
+							n = node->next();
+							if (min <= node->value->first)
+								erase(node);
+							node = n;
+						}
+					}
+				}
 				void	insert(_RBnode *new_node)
 				{
 					if (this->root == _FT_RB_TREE_LEAF)
@@ -862,7 +896,6 @@ namespace ft
 			public:
 				typedef typename Allocator::reference			reference;
 				typedef typename Allocator::const_reference 	const_reference;
-				//replace by bidirect iterator
 				typedef	__ft::__bidirectional_iterator<typename _Rep_type::iterator, map>
 					iterator;
 				typedef	__ft::__normal_iterator<typename _Rep_type::const_iterator, map>
@@ -1001,7 +1034,10 @@ namespace ft
 				{
 					return (this->_binary_tree.erase(x));
 				}
-				void erase(iterator first, iterator last);
+				void erase(iterator first, iterator last)
+				{
+					this->_binary_tree.erase(first.base(), last.base());
+				}
 				void swap(map<Key,T,Compare,Allocator> &x)
 				{
 					this->_binary_tree.swap(x._binary_tree);
