@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/28 18:06:34 by antoine          ###   ########.fr       */
+/*   Updated: 2022/05/28 21:30:03 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,24 +107,18 @@ namespace __ft
 				if (n->right)
 				{
 					n = n->right;
-					while (n->left)
+					while (n && n->left)
 						n = n->left;
 				}
-				else if (n->parent && n->parent->left)
+				else
 				{
-					n = n->parent;
-				}
-				else if (n->parent && n->parent->right)
-				{
-					while (n->parent && n->parent->right)
+					_Key	current(n->value->first);
+
+					while (current >= n->value->first && n->parent)
 						n = n->parent;
-					if (n->parent)
-						n = n->parent;
-					else
+					if (current >= n->value->first)
 						n = NULL;
 				}
-				else
-					n = NULL;
 				return (n);
 			}
 			RBnode	*prev()
@@ -134,24 +128,18 @@ namespace __ft
 				if (n->left)
 				{
 					n = n->left;
-					while (n->right)
+					while (n && n->right)
 						n = n->right;
 				}
-				else if (n->parent && n->parent->right)
+				else
 				{
-					n = n->parent;
-				}
-				else if (n->parent && n->parent->left)
-				{
-					while (n->parent && n->parent->left)
+					_Key	current(n->value->first);
+
+					while (current <= n->value->first && n->parent)
 						n = n->parent;
-					if (n->parent)
-						n = n->parent;
-					else
+					if (current <= n->value->first)
 						n = NULL;
 				}
-				else
-					n = NULL;
 				return (n);
 			}
 			RBnode	*recursive_copy(RBnode *p)
@@ -329,38 +317,38 @@ namespace __ft
 						return (*this);
 					}
 				Rbtree_iterator	operator++(int)
-					{
-						Rbtree_iterator	temp = *this;
+				{
+					Rbtree_iterator	temp = *this;
 
-						++(*this);
-						return (temp);
-					}
+					++(*this);
+					return (temp);
+				}
 				Rbtree_iterator&	operator--()
+				{
+					if (_node && _node == _root->min())
 					{
-						if (_node && _node == _root->min())
-						{
-							_parent = _root->min();
-							_node = NULL;
-						}
-						else if (_node)
-						{
-							_parent = NULL;
-							_node = _node->prev();
-						}
-						else if (_parent && _parent == _root->max())
-						{
-							_parent = NULL;
-							_node = _root->max();
-						}
-						return (*this);
+						_parent = _root->min();
+						_node = NULL;
 					}
+					else if (_node)
+					{
+						_parent = NULL;
+						_node = _node->prev();
+					}
+					else if (_parent && _parent == _root->max())
+					{
+						_parent = NULL;
+						_node = _root->max();
+					}
+					return (*this);
+				}
 				Rbtree_iterator	operator--(int)
-					{
-						Rbtree_iterator	temp = *this;
+				{
+					Rbtree_iterator	temp = *this;
 
-						--(*this);
-						return (temp);
-					}
+					--(*this);
+					return (temp);
+				}
 				reference operator*() const
 				{
 					if (_node)
