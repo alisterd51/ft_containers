@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/29 23:45:42 by antoine          ###   ########.fr       */
+/*   Updated: 2022/05/30 01:54:37 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,14 @@ namespace __ft
 					return (NULL);
 				return (this->parent->brother());
 			}
+			const RBnode  *max() const
+			{
+					const RBnode	*max = this;
+
+					while (max && max->right)
+						max = max->right;
+					return (max);
+			}
 			RBnode  *max()
 			{
 					RBnode	*max = this;
@@ -91,6 +99,14 @@ namespace __ft
 					while (max && max->right)
 						max = max->right;
 					return (max);
+			}
+			const RBnode  *min() const
+			{
+					const RBnode	*min = this;
+
+					while (min && min->left)
+						min = min->left;
+					return (min);
 			}
 			RBnode  *min()
 			{
@@ -114,9 +130,30 @@ namespace __ft
 				{
 					_Key	current(n->value->first);
 
-					while (current >= n->value->first && n->parent)
+					while (!_compare(current, n->value->first) && n->parent)
 						n = n->parent;
-					if (current >= n->value->first)
+					if (!_compare(current, n->value->first))
+						n = NULL;
+				}
+				return (n);
+			}
+			const RBnode	*next() const
+			{
+				const RBnode	*n = this;
+
+				if (n->right)
+				{
+					n = n->right;
+					while (n && n->left)
+						n = n->left;
+				}
+				else
+				{
+					_Key	current(n->value->first);
+
+					while (!_compare(current, n->value->first) && n->parent)
+						n = n->parent;
+					if (!_compare(current, n->value->first))
 						n = NULL;
 				}
 				return (n);
@@ -135,9 +172,30 @@ namespace __ft
 				{
 					_Key	current(n->value->first);
 
-					while (current <= n->value->first && n->parent)
+					while (!_compare(n->value->first, current) && n->parent)
 						n = n->parent;
-					if (current <= n->value->first)
+					if (!_compare(n->value->first, current))
+						n = NULL;
+				}
+				return (n);
+			}
+			const RBnode	*prev() const
+			{
+				const RBnode	*n = this;
+
+				if (n->left)
+				{
+					n = n->left;
+					while (n && n->right)
+						n = n->right;
+				}
+				else
+				{
+					_Key	current(n->value->first);
+
+					while (!_compare(n->value->first, current) && n->parent)
+						n = n->parent;
+					if (!_compare(n->value->first, current))
 						n = NULL;
 				}
 				return (n);
@@ -394,14 +452,14 @@ namespace __ft
 				typedef _RBnode*						node_pointer;
 			public:
 				typedef std::bidirectional_iterator_tag	iterator_category;
-				typedef typename _RBnode::value_type	value_type;
+				typedef typename _RBnode::value_type const	value_type;
 				typedef std::ptrdiff_t					difference_type;
 				typedef value_type*						pointer;
 				typedef value_type&						reference;
 			private:
-				node_pointer	_node;
-				node_pointer	_root;
-				node_pointer	_parent;
+				const _RBnode	*_node;
+				const _RBnode	*_root;
+				const _RBnode	*_parent;
 				value_type		_default_pair;
 
 				template<typename _RBnode1>
