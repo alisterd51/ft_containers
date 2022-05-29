@@ -5,34 +5,48 @@
 int	main()
 {
 	ft::map<char,int> mymap;
-	ft::map<char,int>::iterator it;
-	ft::map<char,int>::iterator ite;
 
-	// insert some values:
-	mymap['a']=10;
-	mymap['b']=20;
-	mymap['c']=30;
-	mymap['d']=40;
-	mymap['e']=50;
-	mymap['f']=60;
 
-	std::cout << (mymap.insert(ft::make_pair<const char, int>('a', 21))).second << std::endl;
-	std::cout << (mymap.insert(ft::make_pair<const char, int>('z', 21))).second << std::endl;
+                if (mymap.begin() != mymap.end())
+                        std::cout << "This should not happen\n";
 
-	mymap.insert(mymap.find('z'), ft::make_pair<const char, int>('z', 42));
-	it=mymap.find('b');
-	std::cout << "found b\n";
-	mymap.erase (it);                   // erasing by iterator
-	std::cout << "erase iterator to b\n";
-	mymap.erase ('c');                  // erasing by key
-	std::cout << "erase by key 'c'\n";
-	it=mymap.find ('e');
-	ite=mymap.find ('z');
-	std::cout << "erase by range 'e' to 'y'\n";
-	mymap.erase ( it, ite );    // erasing by range
+                mymap['b'] = 100;
+                mymap['a'] = 200;
+                mymap['c'] = 300;
 
-	std::cout << " display :\n";
-	// show content:
-	for (it=mymap.begin(); it!=mymap.end(); ++it)
-		std::cout << it->first << " => " << it->second << '\n';
+                if (mymap.begin() == mymap.end())
+                        std::cout << "This is wrong\n";
+                // show content:
+                for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); it++)
+                        std::cout << it->first << " => " << it->second << '\n';
+
+                std::cout << "Hello there\n";
+                for (ft::map<char,int>::const_iterator it=mymap.begin(); it!=mymap.end(); it++)
+                        std::cout << it->first << " => " << it->second << '\n';
+                std::cout << "General Kenobi\n";
+
+                ft::map<char, int>::const_iterator it = mymap.begin();
+                ft::map<char, int>::const_iterator ti = mymap.end();
+                std::cout << "Wupwup\n";
+
+                it++;
+                ++it;
+                it--;
+                --it;
+                std::cout << "marker1\n";
+
+                ti--;
+                --ti;
+                ++ti;
+                ti++;
+
+                ti = it;
+
+                std::cout << "Trump is a kiddo\n";
+                ft::map<char, int>::iterator end = mymap.end();
+                while(it != end)
+                {
+                        std::cout << it->first << " => " << it->second << '\n';
+                        it++;
+                }
 }

@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/28 21:30:03 by antoine          ###   ########.fr       */
+/*   Updated: 2022/05/29 23:45:42 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -355,6 +355,24 @@ namespace __ft
 						return (*(_node->value));
 					return (reference(_default_pair));
 				}
+				pointer operator->() const
+				{
+					return (&operator*());
+				}
+				// for const conversion:
+				node_pointer	get_node() const
+				{
+					return (_node);
+				}
+				node_pointer	get_root() const
+				{
+					return (_root);
+				}
+				node_pointer	get_parent() const
+				{
+					return (_parent);
+				}
+
 		};
 	template<typename _RBnode>
 		bool	operator==(const Rbtree_iterator<_RBnode>& lhs,
@@ -387,8 +405,8 @@ namespace __ft
 				value_type		_default_pair;
 
 				template<typename _RBnode1>
-					friend bool	operator==(const Rbtree_iterator<_RBnode1>&,
-							const Rbtree_iterator<_RBnode1>&);
+					friend bool	operator==(const Rbtree_const_iterator<_RBnode1>&,
+							const Rbtree_const_iterator<_RBnode1>&);
 			public:
 				Rbtree_const_iterator() :
 					_node(),
@@ -398,12 +416,18 @@ namespace __ft
 			{
 			}
 				Rbtree_const_iterator(const Rbtree_const_iterator& x) :
-					_node(),
-					_root(),
-					_parent(),
+					_node(x._node),
+					_root(x._root),
+					_parent(x._parent),
 					_default_pair()
 			{
-				*this = x;
+			}
+				Rbtree_const_iterator(const Rbtree_iterator<_RBnode>& x) :
+					_node(x.get_node()),
+					_root(x.get_root()),
+					_parent(x.get_parent()),
+					_default_pair()
+			{
 			}
 				Rbtree_const_iterator(const node_pointer& node,
 						const node_pointer& root,
@@ -424,18 +448,107 @@ namespace __ft
 					}
 					return (*this);
 				}
-				Rbtree_const_iterator&	operator++();
-				Rbtree_const_iterator	operator++(int);
-				Rbtree_const_iterator&	operator--();
-				Rbtree_const_iterator	operator--(int);
-				reference operator*() const;
+				Rbtree_const_iterator&	operator++()
+				{
+					if (_node && _node == _root->max())
+					{
+						_parent = _root->max();
+						_node = NULL;
+					}
+					else if (_node)
+					{
+						_parent = NULL;
+						_node = _node->next();
+					}
+					else if (_parent && _parent == _root->min())
+					{
+						_parent = NULL;
+						_node = _root->min();
+					}
+					return (*this);
+				}
+				Rbtree_const_iterator	operator++(int)
+				{
+					Rbtree_const_iterator	temp = *this;
+
+					++(*this);
+					return (temp);
+				}
+				Rbtree_const_iterator&	operator--()
+				{
+					if (_node && _node == _root->min())
+					{
+						_parent = _root->min();
+						_node = NULL;
+					}
+					else if (_node)
+					{
+						_parent = NULL;
+						_node = _node->prev();
+					}
+					else if (_parent && _parent == _root->max())
+					{
+						_parent = NULL;
+						_node = _root->max();
+					}
+					return (*this);
+				}
+				Rbtree_const_iterator	operator--(int)
+				{
+					Rbtree_const_iterator	temp = *this;
+
+					--(*this);
+					return (temp);
+				}
+				reference operator*() const
+				{
+					if (_node)
+						return (*(_node->value));
+					return (reference(_default_pair));
+				}
+				pointer operator->() const
+				{
+					return (&operator*());
+				}
 		};
 	template<typename _RBnode>
 		bool	operator==(const Rbtree_const_iterator<_RBnode>& lhs,
-				const Rbtree_const_iterator<_RBnode>& rhs);
+				const Rbtree_const_iterator<_RBnode>& rhs)
+		{
+			return (lhs._node == rhs._node && lhs._parent == rhs._parent);
+		}
 	template<typename _RBnode>
 		bool	operator!=(const Rbtree_const_iterator<_RBnode>& lhs,
-				const Rbtree_const_iterator<_RBnode>& rhs);
+				const Rbtree_const_iterator<_RBnode>& rhs)
+		{
+			return (!(lhs == rhs));
+		}
+	template<typename _RBnode>
+		bool	operator==(const Rbtree_iterator<_RBnode>& lhs,
+				const Rbtree_const_iterator<_RBnode>& rhs)
+		{
+			const Rbtree_const_iterator<_RBnode>	l(lhs);
+			return (l == rhs);
+		}
+	template<typename _RBnode>
+		bool	operator!=(const Rbtree_iterator<_RBnode>& lhs,
+				const Rbtree_const_iterator<_RBnode>& rhs)
+		{
+			return (!(lhs == rhs));
+		}
+	template<typename _RBnode>
+		bool	operator==(const Rbtree_const_iterator<_RBnode>& lhs,
+				const Rbtree_iterator<_RBnode>& rhs)
+		{
+			const Rbtree_const_iterator<_RBnode>	r(rhs);
+			return (lhs == r);
+		}
+	template<typename _RBnode>
+		bool	operator!=(const Rbtree_const_iterator<_RBnode>& lhs,
+				const Rbtree_iterator<_RBnode>& rhs)
+		{
+			return (!(lhs == rhs));
+		}
 
 	template<typename _Key, typename _Val, typename _KeyOfValue, typename _Compare, typename _Alloc = std::allocator<_Val> >
 		struct RBtree
@@ -946,10 +1059,8 @@ namespace ft
 			public:
 				typedef typename Allocator::reference			reference;
 				typedef typename Allocator::const_reference 	const_reference;
-				typedef	__ft::__bidirectional_iterator<typename _Rep_type::iterator, map>
-					iterator;
-				typedef	__ft::__normal_iterator<typename _Rep_type::const_iterator, map>
-					const_iterator;
+				typedef	typename _Rep_type::iterator			iterator;
+				typedef	typename _Rep_type::const_iterator		const_iterator;
 				typedef typename _Rep_type::size_type			size_type;
 				typedef typename _Rep_type::difference_type		difference_type;
 				typedef typename Allocator::pointer				pointer;

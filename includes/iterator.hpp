@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 01:01:23 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/27 11:22:10 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/29 22:17:44 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,125 +254,6 @@ namespace ft
 				const reverse_iterator<_IteratorR>& __y)
 		{
 			return (__y.base() - __x.base());
-		}
-}
-
-namespace __ft
-{
-	template<typename _Iterator, typename _Container>
-		class __bidirectional_iterator
-		{
-			protected:
-				_Iterator _M_current;
-
-				typedef ft::iterator_traits<_Iterator>			traits_type;
-
-			public:
-				typedef _Iterator								iterator_type;
-				typedef typename traits_type::iterator_category	iterator_category;
-				typedef typename traits_type::value_type  		value_type;
-				typedef typename traits_type::difference_type 	difference_type;
-				typedef typename traits_type::reference 		reference;
-				typedef typename traits_type::pointer   		pointer;
-
-				__bidirectional_iterator()
-					: _M_current(_Iterator())
-				{
-				}
-
-				explicit __bidirectional_iterator(const _Iterator& __i)
-					: _M_current(__i)
-				{
-				}
-
-				// Allow iterator to const_iterator conversion
-				template<typename _Iter>
-					__bidirectional_iterator(const __bidirectional_iterator<_Iter,
-							typename ft::enable_if<
-							(ft::is_same<_Iter, typename _Container::pointer>::value),
-							_Container>::type>& __i)
-					: _M_current(__i.base())
-					{
-					}
-
-				// Forward iterator requirements
-				reference
-					operator*() const
-					{
-						return (*_M_current);
-					}
-
-				pointer
-					operator->() const
-					{
-						return (&(*_M_current));
-					}
-
-				__bidirectional_iterator&
-					operator++()
-					{
-						++_M_current;
-						return (*this);
-					}
-
-				__bidirectional_iterator
-					operator++(int)
-					{
-						return (__bidirectional_iterator(_M_current++));
-					}
-
-				// Bidirectional iterator requirements
-				__bidirectional_iterator&
-					operator--()
-					{
-						--_M_current;
-						return (*this);
-					}
-
-				__bidirectional_iterator
-					operator--(int)
-					{
-						return (__bidirectional_iterator(_M_current--));
-					}
-
-				const _Iterator&
-					base() const
-					{
-						return (_M_current);
-					}
-		};
-
-	// Forward iterator requirements
-	template<typename _IteratorL, typename _IteratorR, typename _Container>
-		bool
-		operator==(const __bidirectional_iterator<_IteratorL, _Container>& __lhs,
-				const __bidirectional_iterator<_IteratorR, _Container>& __rhs)
-		{
-			return (__lhs.base() == __rhs.base());
-		}
-
-	template<typename _Iterator, typename _Container>
-		bool
-		operator==(const __bidirectional_iterator<_Iterator, _Container>& __lhs,
-				const __bidirectional_iterator<_Iterator, _Container>& __rhs)
-		{
-			return (__lhs.base() == __rhs.base());
-		}
-
-	template<typename _IteratorL, typename _IteratorR, typename _Container>
-		bool
-		operator!=(const __bidirectional_iterator<_IteratorL, _Container>& __lhs,
-				const __bidirectional_iterator<_IteratorR, _Container>& __rhs)
-		{
-			return __lhs.base() != __rhs.base();
-		}
-
-	template<typename _Iterator, typename _Container>
-		bool
-		operator!=(const __bidirectional_iterator<_Iterator, _Container>& __lhs,
-				const __bidirectional_iterator<_Iterator, _Container>& __rhs)
-		{
-			return (__lhs.base() != __rhs.base());
 		}
 }
 
