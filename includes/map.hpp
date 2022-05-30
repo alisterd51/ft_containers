@@ -759,6 +759,10 @@ namespace __ft
 				{
 					return (iterator(search(x), root));
 				}
+				const_iterator find(_Key x) const
+				{
+					return (const_iterator(search(x), root));
+				}
 				void	balancing_double_black(_RBnode *db_node, _RBnode *db_parent)
 				{
 					_RBnode	*db_brother = NULL;
@@ -1284,7 +1288,7 @@ namespace ft
 				}
 				void erase(iterator first, iterator last)
 				{
-					this->_binary_tree.erase(first.base(), last.base());
+					this->_binary_tree.erase(first, last);
 				}
 				void swap(map<Key,T,Compare,Allocator> &x)
 				{
@@ -1308,7 +1312,10 @@ namespace ft
 				{
 					return (iterator(_binary_tree.find(x)));
 				}
-				const_iterator find(const key_type& x) const;
+				const_iterator find(const key_type& x) const
+				{
+					return (const_iterator(_binary_tree.find(x)));
+				}
 				size_type count(const key_type& x) const
 				{
 					if (_binary_tree.search(x))
