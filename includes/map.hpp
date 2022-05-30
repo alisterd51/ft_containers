@@ -6,7 +6,7 @@
 /*   By: antoine <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/27 00:44:32 by antoine           #+#    #+#             */
-/*   Updated: 2022/05/30 01:54:37 by anclarma         ###   ########.fr       */
+/*   Updated: 2022/05/30 03:11:23 by anclarma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -975,13 +975,16 @@ namespace __ft
 				}
 				void	insert(_Val value)
 				{
-					_RBnode	*new_node = new _RBnode(value);
+					if (search(value.first) == NULL)
+					{
+						_RBnode	*new_node = new _RBnode(value);
 
-					this->insert(new_node);
-					this->balancing(new_node);
-					while (new_node->parent != NULL)
-						new_node = new_node->parent;
-					this->root = new_node;
+						this->insert(new_node);
+						this->balancing(new_node);
+						while (new_node->parent != NULL)
+							new_node = new_node->parent;
+						this->root = new_node;
+					}
 				}
 				void	balancing(_RBnode *n)
 				{
@@ -1329,22 +1332,42 @@ namespace ft
 		};
 	template <class Key, class T, class Compare, class Allocator>
 		bool operator==(const map<Key,T,Compare,Allocator>& x,
-				const map<Key,T,Compare,Allocator>& y);
+				const map<Key,T,Compare,Allocator>& y)
+		{
+			return (equal(x.begin(), x.end(), y.begin())
+					&& equal(y.begin(), y.end(), x.begin()));
+		}
 	template <class Key, class T, class Compare, class Allocator>
 		bool operator< (const map<Key,T,Compare,Allocator>& x,
-				const map<Key,T,Compare,Allocator>& y);
+				const map<Key,T,Compare,Allocator>& y)
+		{
+			return (lexicographical_compare(x.begin(), x.end(), y.begin(),
+						y.end()));
+		}
 	template <class Key, class T, class Compare, class Allocator>
 		bool operator!=(const map<Key,T,Compare,Allocator>& x,
-				const map<Key,T,Compare,Allocator>& y);
+				const map<Key,T,Compare,Allocator>& y)
+		{
+			return (!(x == y));
+		}
 	template <class Key, class T, class Compare, class Allocator>
 		bool operator> (const map<Key,T,Compare,Allocator>& x,
-				const map<Key,T,Compare,Allocator>& y);
+				const map<Key,T,Compare,Allocator>& y)
+		{
+			return (y < x);
+		}
 	template <class Key, class T, class Compare, class Allocator>
 		bool operator>=(const map<Key,T,Compare,Allocator>& x,
-				const map<Key,T,Compare,Allocator>& y);
+				const map<Key,T,Compare,Allocator>& y)
+		{
+			return (!(x < y));
+		}
 	template <class Key, class T, class Compare, class Allocator>
 		bool operator<=(const map<Key,T,Compare,Allocator>& x,
-				const map<Key,T,Compare,Allocator>& y);
+				const map<Key,T,Compare,Allocator>& y)
+		{
+			return (!(y < x));
+		}
 	// specialized algorithms:
 	template <class Key, class T, class Compare, class Allocator>
 		void swap(map<Key,T,Compare,Allocator>& x,
