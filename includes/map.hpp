@@ -755,6 +755,7 @@ namespace __ft
 					}
 					return (node);
 				}
+				iterator	lower_bound(_Key key) const;
 				iterator find(_Key x)
 				{
 					return (iterator(search(x), root));
@@ -1322,14 +1323,40 @@ namespace ft
 					else
 						return (0);
 				}
-				iterator lower_bound(const key_type& x);
-				const_iterator lower_bound(const key_type& x) const;
-				iterator upper_bound(const key_type& x);
-				const_iterator upper_bound(const key_type& x) const;
-				ft::pair<iterator,iterator>
-					equal_range(const key_type& x);
-				ft::pair<const_iterator,const_iterator>
-					equal_range(const key_type& x) const;
+				iterator lower_bound(const key_type& x)
+				{
+					return (iterator(_binary_tree.lower_bound(x)));
+				}
+				const_iterator lower_bound(const key_type& x) const
+				{
+					return (const_iterator(_binary_tree.lower_bound(x)));
+				}
+				iterator upper_bound(const key_type& x)
+				{
+					iterator	l = lower_bound(x);
+
+					if (l->first == x)
+						++l;
+					return (l);
+				}
+				const_iterator upper_bound(const key_type& x) const
+				{
+					const_iterator	l = lower_bound(x);
+
+					if (l->first == x)
+						++l;
+					return (l);
+				}
+				ft::pair<iterator, iterator>
+					equal_range(const key_type& x)
+					{
+						return (ft::make_pair<iterator, iterator>(lower_bound(x), upper_bound(x)));
+					}
+				ft::pair<const_iterator, const_iterator>
+					equal_range(const key_type& x) const
+					{
+						return (ft::make_pair<const_iterator, const_iterator>(lower_bound(x), upper_bound(x)));
+					}
 				// allocator:
 				allocator_type get_allocator() const
 				{
