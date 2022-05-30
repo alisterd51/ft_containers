@@ -436,7 +436,7 @@ namespace __ft
 		bool	operator==(const Rbtree_iterator<_RBnode>& lhs,
 				const Rbtree_iterator<_RBnode>& rhs)
 		{
-			return (lhs._node == rhs._node && lhs._parent == rhs._parent);
+			return (lhs._node == rhs._node/* && lhs._parent == rhs._parent*/);
 		}
 	template<typename _RBnode>
 		bool	operator!=(const Rbtree_iterator<_RBnode>& lhs,
@@ -755,14 +755,41 @@ namespace __ft
 					}
 					return (node);
 				}
-				iterator	lower_bound(_Key key) const;
+				iterator	lower_bound(_Key key) const
+				{
+					_RBnode	*node = search(key);
+
+					if (!root)
+						return (iterator(root, root));
+					if (node)
+						return (iterator(node, root));
+					node = root->min();
+					if (_compare(key, node->value->first))
+						return (iterator(node, root));
+					node = root->max();
+					if (_compare(node->value->first, key))
+						return (++iterator(node, root));
+
+					iterator	it(root->min(), root);
+					while (_compare(it->first, key))
+						++it;
+					return (it);//vrai mais ne respecte pas la complexiter de l'iso
+				}
 				iterator find(_Key x)
 				{
-					return (iterator(search(x), root));
+					_RBnode	*f = search(x);
+					if (f)
+						return (iterator(f, root));
+					else
+						return (++iterator(root->max(), root));
 				}
 				const_iterator find(_Key x) const
 				{
-					return (const_iterator(search(x), root));
+					_RBnode	*f = search(x);
+					if (f)
+						return (const_iterator(f, root));
+					else
+						return (++const_iterator(root->max(), root));
 				}
 				void	balancing_double_black(_RBnode *db_node, _RBnode *db_parent)
 				{
@@ -937,11 +964,11 @@ namespace __ft
 					}
 					return (0);
 				}
-				void	erase(iterator first, iterator last)
+				void	erase(iterator first, iterator last)//peut etre faux
 				{
 					if (last == ++iterator(root->max(), root))
 					{
-						_Key	min((*first).first);
+						_Key	min(first->first);
 						_RBnode	*node(search(min));
 						_RBnode	*n;
 
@@ -955,8 +982,8 @@ namespace __ft
 					}
 					else
 					{
-						_Key	min((*first).first);
-						_Key	max((*last).first);
+						_Key	min(first->first);
+						_Key	max(last->first);
 						_RBnode	*node(search(min));
 						_RBnode	*n;
 
@@ -1310,11 +1337,17 @@ namespace ft
 				// 23.3.1.3 map operations:
 				iterator find(const key_type& x)
 				{
-					return (iterator(_binary_tree.find(x)));
+					if (count(x))
+						return (iterator(_binary_tree.search(x), _binary_tree.root));
+					else
+						return (end());
 				}
 				const_iterator find(const key_type& x) const
 				{
-					return (const_iterator(_binary_tree.find(x)));
+					if (count(x))
+						return (const_iterator(_binary_tree.search(x), _binary_tree.root));
+					else
+						return (end());
 				}
 				size_type count(const key_type& x) const
 				{
@@ -1335,7 +1368,7 @@ namespace ft
 				{
 					iterator	l = lower_bound(x);
 
-					if (l->first == x)
+					if (!_compare(x, l->first) && !_compare(l->first, x))
 						++l;
 					return (l);
 				}
