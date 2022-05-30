@@ -961,7 +961,6 @@ namespace __ft
 
 						while (node && node->value->first < max)
 						{
-							std::cout << node << std::endl;
 							n = node->next();
 							if (min <= node->value->first)
 								erase(node);
@@ -1305,7 +1304,7 @@ namespace ft
 				}
 				value_compare value_comp() const
 				{
-					return (value_compare());
+					return (value_compare(_compare));
 				}
 				// 23.3.1.3 map operations:
 				iterator find(const key_type& x)
