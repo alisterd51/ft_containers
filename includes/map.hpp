@@ -964,36 +964,14 @@ namespace __ft
 					}
 					return (0);
 				}
-				void	erase(iterator first, iterator last)//peut etre faux
+				void	erase(iterator first, iterator last)
 				{
-					if (last == ++iterator(root->max(), root))
-					{
-						_Key	min(first->first);
-						_RBnode	*node(search(min));
-						_RBnode	*n;
+					_Key		min(first->first);
 
-						while (node)
-						{
-							n = node->next();
-							if (min <= node->value->first)
-								erase(node);
-							node = n;
-						}
-					}
-					else
+					while (first != last)
 					{
-						_Key	min(first->first);
-						_Key	max(last->first);
-						_RBnode	*node(search(min));
-						_RBnode	*n;
-
-						while (node && node->value->first < max)
-						{
-							n = node->next();
-							if (min <= node->value->first)
-								erase(node);
-							node = n;
-						}
+						erase(first->first);
+						first = lower_bound(min);
 					}
 				}
 				void	insert(_RBnode *new_node)
