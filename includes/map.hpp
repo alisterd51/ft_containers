@@ -625,6 +625,8 @@ namespace __ft
 
 				RBtree() :
 					root(NULL),
+					min(NULL),
+					max(NULL),
 					_compare(_Compare()),
 					_alloc_node(_Alloc_node()),
 					_size(0)
@@ -638,6 +640,8 @@ namespace __ft
 				{
 					recursive_remove(this->root);
 					this->root = NULL;
+					this->min = NULL;
+					this->max = NULL;
 					this->_size = 0;
 				}
 				RBtree&	operator=(const RBtree& x)
@@ -649,37 +653,39 @@ namespace __ft
 							this->root = x.root->recursive_copy(NULL);
 						else
 							this->root = NULL;
+						update_limit();
 						this->_size = x._size;
 					}
 					return (*this);
 				}
-				_RBnode	*min() const
+				void	update_limit()
 				{
 					if (root)
-						return (root->min());
-					return (root);
-				}
-				_RBnode	*max() const
-				{
-					if (root)
-						return (root->max());
-					return (root);
+					{
+						min = root->min();
+						max = root->max();
+					}
+					else
+					{
+						min = NULL;
+						max = NULL;
+					}
 				}
 				iterator	begin()
 				{
-					return (iterator(min(), root));
+					return (iterator(min, root));
 				}
 				const_iterator	begin() const
 				{
-					return (const_iterator(min(), root));
+					return (const_iterator(min, root));
 				}
 				iterator	end()
 				{
-					return (++iterator(max(), root));
+					return (++iterator(max, root));
 				}
 				const_iterator	end() const
 				{
-					return (++const_iterator(max(), root));
+					return (++const_iterator(max, root));
 				}
 				void	recursive_remove(_RBnode *node)
 				{
@@ -763,14 +769,14 @@ namespace __ft
 						return (iterator(root, root));
 					if (node)
 						return (iterator(node, root));
-					node = root->min();
+					node = min;
 					if (_compare(key, node->value->first))
 						return (iterator(node, root));
-					node = root->max();
+					node = max;
 					if (_compare(node->value->first, key))
 						return (++iterator(node, root));
 
-					iterator	it(root->min(), root);
+					iterator	it(min, root);
 					while (_compare(it->first, key))
 						++it;
 					return (it);//vrai mais ne respecte pas la complexiter de l'iso
@@ -781,7 +787,7 @@ namespace __ft
 					if (f)
 						return (iterator(f, root));
 					else
-						return (++iterator(root->max(), root));
+						return (++iterator(max, root));
 				}
 				const_iterator find(_Key x) const
 				{
@@ -789,7 +795,7 @@ namespace __ft
 					if (f)
 						return (const_iterator(f, root));
 					else
-						return (++const_iterator(root->max(), root));
+						return (++const_iterator(max, root));
 				}
 				void	balancing_double_black(_RBnode *db_node, _RBnode *db_parent)
 				{
@@ -953,6 +959,7 @@ namespace __ft
 							}
 						}
 					}
+					update_limit();
 				}
 				size_type	erase(_Key key)
 				{
@@ -989,8 +996,8 @@ namespace __ft
 				void	insert(iterator pos, _Val value)
 				{
 					if (_compare(pos->first, value.first)
-							&& (root->max() == NULL
-								|| pos->first == root->max()->value->first
+							&& (max == NULL
+								|| pos->first == max->value->first
 								|| _compare(value.first, (++pos)->first)))
 					{
 						_RBnode	*new_node = new _RBnode(value);
@@ -1000,6 +1007,7 @@ namespace __ft
 						while (new_node->parent != NULL)
 							new_node = new_node->parent;
 						this->root = new_node;
+						update_limit();
 					}
 					else
 						insert(value);
@@ -1015,6 +1023,7 @@ namespace __ft
 						while (new_node->parent != NULL)
 							new_node = new_node->parent;
 						this->root = new_node;
+						update_limit();
 					}
 				}
 				void	balancing(_RBnode *n)
@@ -1098,7 +1107,7 @@ namespace __ft
 					while (node && (_compare(node->value->first, key)
 								|| _compare(key, node->value->first)))
 					{
-						if (_compare(key, node->value->first))//////////////////
+						if (_compare(key, node->value->first))
 							node = node->left;
 						else
 							node = node->right;
@@ -1117,16 +1126,24 @@ namespace __ft
 				void swap(RBtree &x)
 				{
 					_RBnode		*tmp_root = this->root;
+					_RBnode		*tmp_min = this->min;
+					_RBnode		*tmp_max = this->max;
 					size_type	tmp_size = this->_size;
 
 					this->root = x.root;
+					this->min = x.min;
+					this->max = x.max;
 					this->_size = x._size;
 					x.root = tmp_root;
+					x.min = tmp_min;
+					x.max = tmp_max;
 					x._size = tmp_size;
 				}
 
 				_RBnode		*root;
 			private:
+				_RBnode		*min;
+				_RBnode		*max;
 				_Compare	_compare;
 				_Alloc_node	_alloc_node;
 				size_type	_size;
