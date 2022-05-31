@@ -974,13 +974,35 @@ namespace __ft
 						first = lower_bound(min);
 					}
 				}
-				void	insert(_RBnode *new_node)
+				void	insert(_RBnode *p, _RBnode *new_node)
 				{
 					if (this->root == _FT_RB_TREE_LEAF)
 						this->root = new_node;
 					else
-						this->root->insert(new_node);
+						p->insert(new_node);
 					++_size;
+				}
+				void	insert(_RBnode *new_node)
+				{
+					this->insert(this->root, new_node);
+				}
+				void	insert(iterator pos, _Val value)
+				{
+					if (_compare(pos->first, value.first)
+							&& (root->max() == NULL
+								|| pos->first == root->max()->value->first
+								|| _compare(value.first, (++pos)->first)))
+					{
+						_RBnode	*new_node = new _RBnode(value);
+
+						this->insert(search(pos->first), new_node);
+						this->balancing(new_node);
+						while (new_node->parent != NULL)
+							new_node = new_node->parent;
+						this->root = new_node;
+					}
+					else
+						insert(value);
 				}
 				void	insert(_Val value)
 				{
@@ -1266,16 +1288,8 @@ namespace ft
 				}
 				iterator insert(iterator position, const value_type& x)
 				{
-					if (position->first == x.first)
-					{
-						position->second = x.second;
-						return (position);
-					}
-					else
-					{
-						_binary_tree.insert(x);
-						return (find(x.first));
-					}
+					_binary_tree.insert(position, x);
+					return (find(x.first));
 				}
 				template <class InputIterator>
 					void insert(InputIterator first, InputIterator last)
