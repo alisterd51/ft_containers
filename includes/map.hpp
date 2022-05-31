@@ -436,7 +436,9 @@ namespace __ft
 		bool	operator==(const Rbtree_iterator<_RBnode>& lhs,
 				const Rbtree_iterator<_RBnode>& rhs)
 		{
-			return (lhs._node == rhs._node/* && lhs._parent == rhs._parent*/);
+			return ((lhs._root == NULL && rhs._root == NULL)
+					|| (lhs._node == NULL && rhs._node == NULL)
+					|| (lhs._node && rhs._node && lhs._node == rhs._node));
 		}
 	template<typename _RBnode>
 		bool	operator!=(const Rbtree_iterator<_RBnode>& lhs,
@@ -573,7 +575,9 @@ namespace __ft
 		bool	operator==(const Rbtree_const_iterator<_RBnode>& lhs,
 				const Rbtree_const_iterator<_RBnode>& rhs)
 		{
-			return (lhs._node == rhs._node && lhs._parent == rhs._parent);
+			return ((lhs._root == NULL && rhs._root == NULL)
+					|| (lhs._node == NULL && rhs._node == NULL)
+					|| (lhs._node && rhs._node && lhs._node == rhs._node));
 		}
 	template<typename _RBnode>
 		bool	operator!=(const Rbtree_const_iterator<_RBnode>& lhs,
@@ -768,6 +772,8 @@ namespace __ft
 					if (!root)
 						return (iterator(root, root));
 					if (node)
+						return (iterator(node, root));
+					if (min == max && !_compare(key, max->value->first))
 						return (iterator(node, root));
 					node = min;
 					if (_compare(key, node->value->first))
@@ -1409,8 +1415,8 @@ namespace ft
 		bool operator==(const map<Key,T,Compare,Allocator>& x,
 				const map<Key,T,Compare,Allocator>& y)
 		{
-			return (equal(x.begin(), x.end(), y.begin())
-					&& equal(y.begin(), y.end(), x.begin()));
+			return (x.size() == y.size() && std::equal(x.begin(), x.end(), y.begin())
+					&& std::equal(y.begin(), y.end(), x.begin()));
 		}
 	template <class Key, class T, class Compare, class Allocator>
 		bool operator< (const map<Key,T,Compare,Allocator>& x,
